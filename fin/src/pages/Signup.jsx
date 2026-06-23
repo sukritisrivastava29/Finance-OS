@@ -3,12 +3,14 @@ import { useState } from "react";
 import axios from "axios";
 function Signup() {
   const navigate = useNavigate();
-
+const [error, setError] = useState("");
 const [name, setName] = useState("");
 const [email, setEmail] = useState("");
 const [password, setPassword] = useState("");
 const handleSubmit = async () => {
   try {
+    setError("");
+
     await axios.post(
       "http://localhost:8000/auth/register",
       {
@@ -19,8 +21,8 @@ const handleSubmit = async () => {
     );
 
     navigate("/login");
-  } catch (error) {
-    console.log(error);
+  } catch (err) {
+    setError(err.response?.data?.message || "Something went wrong");
   }
 };
   return (
@@ -62,6 +64,11 @@ const handleSubmit = async () => {
   onChange={(e) => setPassword(e.target.value)}
   className="w-full p-3 rounded-lg bg-slate-800 outline-none border border-slate-700"
 />
+{error && (
+  <p className="text-red-500 text-sm">
+    {error}
+  </p>
+)}
           <button
   onClick={handleSubmit}
   className="w-full bg-blue-600 py-3 rounded-lg hover:bg-blue-700 transition"

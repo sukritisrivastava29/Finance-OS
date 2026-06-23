@@ -2,30 +2,63 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Sidebar from "../components/Sidebar";
-
+import AddTransactionModal from "../components/AddTransactionModal";
 
 function Dashboards() {
- const [transactions, setTransactions] = useState([]);
- const token=localStorage.getItem("token");
- const user = JSON.parse(
-  localStorage.getItem("user")
-);
+  const [editingTransaction, setEditingTransaction] = useState(null);
+  const [transactions, setTransactions] = useState([]);
+  const token = localStorage.getItem("token");
+  const user = JSON.parse(
+    localStorage.getItem("user")
+  );
   const [summary, setSummary] = useState({
-  income: 0,
-  expense: 0,
-  balance: 0,
-});
+    income: 0,
+    expense: 0,
+    balance: 0,
+  });
+  const [showModal, setShowModal] = useState(false);
+  useEffect(() => {
+    fetchSummary();
+    fetchTransactions();
+  }, []);
+  const API_URL = "http://localhost:8000";
 
-useEffect(() => {
-  fetchSummary();
-  fetchTransactions();
-}, []);
-const API_URL = "http://localhost:8000";
+  const fetchTransactions = async () => {
+    try {
+      const { data } = await axios.get(
+        `${API_URL}/transactions`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-const fetchTransactions = async () => {
+      setTransactions(data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const fetchSummary = async () => {
+    try {
+      const { data } = await axios.get(
+        `${API_URL}/transactions/summary`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setSummary(data);
+    } catch (error) {
+      console.log(error);
+    }};
+const deleteTransaction = async (id) => {
   try {
-    const { data } = await axios.get(
-      `${API_URL}/transactions`,
+    await axios.delete(
+      `${API_URL}/transactions/${id}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -33,28 +66,13 @@ const fetchTransactions = async () => {
       }
     );
 
-    setTransactions(data);
+    fetchTransactions();
+    fetchSummary();
   } catch (error) {
     console.log(error);
   }
 };
 
-const fetchSummary = async () => {
-  try {
-    const { data } = await axios.get(
-      `${API_URL}/transactions/summary`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-    setSummary(data);
-  } catch (error) {
-    console.log(error);
-  }
-};
   return (
     <div className="min-h-screen bg-slate-950 text-white flex">
       <Sidebar />
@@ -67,13 +85,16 @@ const fetchSummary = async () => {
               Dashboard
             </h1>
 
-           <p className="text-slate-400">
-  Welcome back, {user?.name}
-</p>
+            <p className="text-slate-400">
+              Welcome back, {user?.name}
+            </p>
           </div>
 
-          <button className="bg-blue-600 px-4 py-2 rounded-lg hover:bg-blue-700">
-            Add Transaction
+          <button
+            onClick={() => setShowModal(true)}
+            className="bg-blue-600 px-4 py-2 rounded-lg hover:bg-blue-700"
+          >
+            + Add Transaction
           </button>
         </div>
 
@@ -86,7 +107,7 @@ const fetchSummary = async () => {
             </p>
 
             <h2 className="text-3xl font-bold mt-2">
-             ₹{summary.balance}
+              ₹{summary.balance}
             </h2>
 
             <p className="text-green-400 mt-2">
@@ -114,7 +135,7 @@ const fetchSummary = async () => {
             </p>
 
             <h2 className="text-3xl font-bold mt-2">
-             ₹{summary.income}
+              ₹{summary.income}
             </h2>
 
             <p className="text-green-400 mt-2">
@@ -130,32 +151,68 @@ const fetchSummary = async () => {
             Recent Transactions
           </h2>
 
-          <div className="space-y-4">
-  {transactions.map((transaction) => (
-    <div
-      key={transaction._id}
-      className="flex justify-between"
-    >
-      <p>{transaction.title}</p>
+         <div className="space-y-4">
+  {transactions.length === 0 ? (
+    <p className="text-center text-slate-400 py-8">
+      No transactions yet. Click "Add Transaction" to get started.
+    </p>
+  ) : (
+    transactions.map((transaction) => (
+     <div
+  key={transaction._id}
+  className="flex justify-between items-center bg-slate-800 p-4 rounded-lg"
+>
+  <div>
+    <p>{transaction.title}</p>
+    <p className="text-sm text-slate-400">
+      {transaction.category}
+    </p>
+  </div>
 
-      <p
-        className={
-          transaction.type === "income"
-            ? "text-green-400"
-            : "text-red-400"
-        }
-      >
-        {transaction.type === "income" ? "+" : "-"}₹
-        {transaction.amount}
-      </p>
-    </div>
-  ))}
+  <div className="flex items-center gap-4">
+    <p
+      className={
+        transaction.type === "income"
+          ? "text-green-400"
+          : "text-red-400"
+      }
+    >
+      {transaction.type === "income" ? "+" : "-"}₹
+      {transaction.amount}
+    </p>
+
+<button
+  onClick={() => {
+    setEditingTransaction(transaction);
+    setShowModal(true);
+  }}
+  className="text-blue-400 hover:text-blue-600"
+>
+  ✏️
+</button>
+    <button
+      onClick={() => deleteTransaction(transaction._id)}
+      className="text-red-500 hover:text-red-700"
+    >
+      🗑️
+    </button>
+  </div>
+</div>
+    ))
+  )}
 </div>
         </div>
-
-       
-        
       </div>
+      {showModal && (
+        <AddTransactionModal
+        transaction={editingTransaction}
+          onClose={() => setShowModal(false)}
+          refreshTransactions={() => {
+            fetchTransactions();
+            fetchSummary();
+          }}
+        />
+      )}
     </div>
   );
 }

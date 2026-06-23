@@ -15,7 +15,34 @@ async function createTransaction(req, res) {
   }
 }
 
+const updateTransaction = async (req, res) => {
+  try {
+    const { id } = req.params;
 
+    const transaction = await Transaction.findOneAndUpdate(
+      {
+        _id: id,
+        user: req.user.id,
+      },
+      req.body,
+      {
+        new: true,
+      }
+    );
+
+    if (!transaction) {
+      return res.status(404).json({
+        message: "Transaction not found",
+      });
+    }
+
+    res.status(200).json(transaction);
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
 const getTransactions = async (req, res) => {
   try {
     const transactions = await Transaction.find({
@@ -88,4 +115,5 @@ module.exports = {
    getTransactions,
    deleteTransaction,
    getSummary,
+   updateTransaction,
 };
