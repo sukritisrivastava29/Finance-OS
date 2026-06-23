@@ -1,0 +1,93 @@
+import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import axios from "axios";
+
+function Login() {
+  const navigate = useNavigate();
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleLogin = async () => {
+    try {
+      const { data } = await axios.post(
+        "http://localhost:8000/auth/login",
+        {
+          email,
+          password,
+        }
+      );
+
+      localStorage.setItem("token", data.token);
+
+      localStorage.setItem(
+        "user",
+        JSON.stringify(data.user)
+      );
+
+      navigate("/dashboard");
+    } catch (error) {
+      console.log(error.response?.data);
+
+      alert(
+        error.response?.data?.message ||
+          "Login failed"
+      );
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center px-6">
+      <div className="bg-slate-900 p-8 rounded-xl w-full max-w-md">
+        <h1 className="text-3xl font-bold mb-2">
+          Welcome Back
+        </h1>
+
+        <p className="text-slate-400 mb-6">
+          Login to your FinanceOS account.
+        </p>
+
+        <div className="space-y-4">
+          <input
+            type="email"
+            placeholder="Email Address"
+            value={email}
+            onChange={(e) =>
+              setEmail(e.target.value)
+            }
+            className="w-full p-3 rounded-lg bg-slate-800 border border-slate-700 outline-none"
+          />
+
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) =>
+              setPassword(e.target.value)
+            }
+            className="w-full p-3 rounded-lg bg-slate-800 border border-slate-700 outline-none"
+          />
+
+          <button
+            onClick={handleLogin}
+            className="w-full bg-blue-600 py-3 rounded-lg hover:bg-blue-700 transition"
+          >
+            Login
+          </button>
+
+          <p className="text-slate-400 text-center">
+            Don't have an account?{" "}
+            <Link
+              to="/signup"
+              className="text-blue-400 hover:text-blue-300"
+            >
+              Sign Up
+            </Link>
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default Login;
