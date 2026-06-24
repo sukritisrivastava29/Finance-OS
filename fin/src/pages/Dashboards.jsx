@@ -1,13 +1,16 @@
-
+import ExpensePieChart from "../components/ExpensePieChart";
+import MonthlyChart from "../components/MonthlyChart";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Sidebar from "../components/Sidebar";
 import AddTransactionModal from "../components/AddTransactionModal";
 
 function Dashboards() {
+    const API_URL = "http://localhost:8000";
   const [editingTransaction, setEditingTransaction] = useState(null);
   const [transactions, setTransactions] = useState([]);
   const token = localStorage.getItem("token");
+  console.log("Token:", token);
   const user = JSON.parse(
     localStorage.getItem("user")
   );
@@ -16,12 +19,28 @@ function Dashboards() {
     expense: 0,
     balance: 0,
   });
+  const [analytics, setAnalytics] = useState({
+  expenseByCategory: [],
+  monthlyIncomeExpense: [],
+});
   const [showModal, setShowModal] = useState(false);
-  useEffect(() => {
-    fetchSummary();
-    fetchTransactions();
-  }, []);
-  const API_URL = "http://localhost:8000";
+
+  const fetchAnalytics = async () => {
+    try {
+      const { data } = await axios.get(
+        `${API_URL}/transactions/analytics`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setAnalytics(data);
+    } catch (error) {
+      console.log(error.response?.data);
+    }
+  };
 
   const fetchTransactions = async () => {
     try {
@@ -55,6 +74,7 @@ function Dashboards() {
     } catch (error) {
       console.log(error);
     }};
+
 const deleteTransaction = async (id) => {
   try {
     await axios.delete(
@@ -65,13 +85,18 @@ const deleteTransaction = async (id) => {
         },
       }
     );
-
     fetchTransactions();
     fetchSummary();
   } catch (error) {
     console.log(error);
   }
 };
+
+useEffect(() => {
+  fetchTransactions();
+  fetchSummary();
+  fetchAnalytics();
+}, []);
 
   return (
     <div className="min-h-screen bg-slate-950 text-white flex">
@@ -202,6 +227,15 @@ const deleteTransaction = async (id) => {
   )}
 </div>
         </div>
+        <div className="grid md:grid-cols-2 gap-6 mb-10">
+  <ExpensePieChart
+    data={analytics.expenseByCategory}
+  />
+
+  <MonthlyChart
+    data={analytics.monthlyIncomeExpense}
+  />
+</div>
       </div>
       {showModal && (
         <AddTransactionModal
