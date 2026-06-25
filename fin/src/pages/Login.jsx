@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import axios from "axios";
-
+import { API_URL } from "../config";
 function Login() {
   const navigate = useNavigate();
 
@@ -11,7 +11,7 @@ function Login() {
   const handleLogin = async () => {
     try {
       const { data } = await axios.post(
-        "http://localhost:8000/auth/login",
+        `${API_URL}/auth/login`,
         {
           email,
           password,
@@ -47,7 +47,13 @@ function Login() {
           Login to your FinanceOS account.
         </p>
 
-        <div className="space-y-4">
+        <form
+  className="space-y-4"
+  onSubmit={(e) => {
+    e.preventDefault();
+    handleLogin();
+  }}
+>
           <input
             type="email"
             placeholder="Email Address"
@@ -69,11 +75,11 @@ function Login() {
           />
 
           <button
-            onClick={handleLogin}
-            className="w-full bg-blue-600 py-3 rounded-lg hover:bg-blue-700 transition"
-          >
-            Login
-          </button>
+  type="submit"
+  className="w-full bg-blue-600 py-3 rounded-lg hover:bg-blue-700 transition"
+>
+  Login
+</button>
 
           <p className="text-slate-400 text-center">
             Don't have an account?{" "}
@@ -84,9 +90,9 @@ function Login() {
               Sign Up
             </Link>
           </p>
+          </form>
         </div>
       </div>
-    </div>
   );
 }
 

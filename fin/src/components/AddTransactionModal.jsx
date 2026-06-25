@@ -1,6 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
-
+import { API_URL } from "../config";
 function AddTransactionModal({
   transaction,
   onClose,
@@ -34,45 +34,45 @@ function AddTransactionModal({
     try {
       if (transaction) {
         // Update existing transaction
-        await axios.put(
-          `http://localhost:8000/transactions/${transaction._id}`,
-          {
-            title,
-            amount,
-            category,
-            type,
-            date,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+      await axios.put(
+  `${API_URL}/transactions/${transaction._id}`,
+  {
+    title,
+    amount,
+    category,
+    type,
+    date,
+  },
+  {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  }
+);
       } else {
         // Create new transaction
-        await axios.post(
-          "http://localhost:8000/transactions",
-          {
-            title,
-            amount,
-            category,
-            type,
-            date,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+       await axios.post(
+  `${API_URL}/transactions`,
+  {
+    title,
+    amount,
+    category,
+    type,
+    date,
+  },
+  {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  }
+);
       }
 
       refreshTransactions();
       onClose();
     } catch (error) {
-      console.log(error);
-    }
+  console.log("ERROR:", error.response?.data);
+}
   };
 
   return (

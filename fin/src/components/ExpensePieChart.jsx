@@ -15,7 +15,7 @@ function ExpensePieChart({ data }) {
     "#ef4444",
     "#8b5cf6",
   ];
-
+console.log("Pie Data:", data);
   return (
     <div className="bg-slate-900 p-6 rounded-xl">
       <h2 className="text-xl font-bold mb-4">

@@ -4,9 +4,8 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import Sidebar from "../components/Sidebar";
 import AddTransactionModal from "../components/AddTransactionModal";
-
+import { API_URL } from "../config";
 function Dashboards() {
-    const API_URL = "http://localhost:8000";
   const [editingTransaction, setEditingTransaction] = useState(null);
   const [transactions, setTransactions] = useState([]);
   const token = localStorage.getItem("token");
@@ -238,14 +237,15 @@ useEffect(() => {
 </div>
       </div>
       {showModal && (
-        <AddTransactionModal
-        transaction={editingTransaction}
-          onClose={() => setShowModal(false)}
-          refreshTransactions={() => {
-            fetchTransactions();
-            fetchSummary();
-          }}
-        />
+      <AddTransactionModal
+  transaction={editingTransaction}
+  onClose={() => setShowModal(false)}
+  refreshTransactions={() => {
+    fetchTransactions();
+    fetchSummary();
+    fetchAnalytics();
+  }}
+/>
       )}
     </div>
   );

@@ -11,31 +11,31 @@ function DashPreview() {
 
           <div className="bg-slate-900 rounded-2xl p-6">
             <p className="text-slate-400 mb-2">
-              Total Balance
+              AI Insights
             </p>
 
-            <h3 className="text-3xl font-bold text-green-400">
-              ₹25,000
+            <h3 className="text-2xl font-bold text-blue-400">
+              Smart Analysis
             </h3>
           </div>
 
           <div className="bg-slate-900 rounded-2xl p-6">
             <p className="text-slate-400 mb-2">
-              Income
+              Reports
             </p>
 
-            <h3 className="text-3xl font-bold text-blue-400">
-              ₹30,000
+            <h3 className="text-2xl font-bold text-green-400">
+              PDF Export
             </h3>
           </div>
 
           <div className="bg-slate-900 rounded-2xl p-6">
             <p className="text-slate-400 mb-2">
-              Expenses
+              Automation
             </p>
 
-            <h3 className="text-3xl font-bold text-red-400">
-              ₹5,000
+            <h3 className="text-2xl font-bold text-purple-400">
+              Receipt Scanner
             </h3>
           </div>
 
@@ -44,29 +44,29 @@ function DashPreview() {
         <div className="mt-8 bg-slate-900 rounded-2xl p-6">
 
           <h3 className="text-xl font-semibold mb-4">
-            Recent Transactions
+            Recent Activity
           </h3>
 
           <div className="space-y-3">
 
             <div className="flex justify-between">
-              <span>💼 Salary</span>
+              <span>📄 Monthly Report Generated</span>
               <span className="text-green-400">
-                +₹20,000
+                Completed
               </span>
             </div>
 
             <div className="flex justify-between">
-              <span>🍔 Food</span>
-              <span className="text-red-400">
-                -₹200
+              <span>🤖 AI Spending Insight Available</span>
+              <span className="text-blue-400">
+                New
               </span>
             </div>
 
             <div className="flex justify-between">
-              <span>☕ Coffee</span>
-              <span className="text-red-400">
-                -₹80
+              <span>🧾 Receipt Scanned Successfully</span>
+              <span className="text-purple-400">
+                Processed
               </span>
             </div>
 
