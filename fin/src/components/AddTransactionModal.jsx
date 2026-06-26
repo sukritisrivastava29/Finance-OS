@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import { API_URL } from "../config";
+import toast from "react-hot-toast";
 function AddTransactionModal({
   transaction,
   onClose,
@@ -48,7 +49,7 @@ function AddTransactionModal({
       Authorization: `Bearer ${token}`,
     },
   }
-);
+); toast.success("Transaction updated successfully!");
       } else {
         // Create new transaction
        await axios.post(
@@ -65,7 +66,7 @@ function AddTransactionModal({
       Authorization: `Bearer ${token}`,
     },
   }
-);
+); toast.success("Transaction added successfully!");
       }
 
       refreshTransactions();
@@ -138,7 +139,7 @@ function AddTransactionModal({
 
             <button
               onClick={handleSubmit}
-              className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700"
+             className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:scale-105 transition-all duration-200 font-medium shadow-lg"
             >
               {transaction ? "Update" : "Save"}
             </button>

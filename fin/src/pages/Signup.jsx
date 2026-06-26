@@ -2,30 +2,37 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import axios from "axios";
 import { API_URL } from "../config";
+import toast from "react-hot-toast";
 function Signup() {
   const navigate = useNavigate();
   const [error, setError] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const handleSubmit = async () => {
-    try {
-      setError("");
+  const handleSignup = async () => {
+  try {
+    await axios.post(
+      `${API_URL}/auth/signup`,
+      {
+        name,
+        email,
+        password,
+      }
+    );
 
-      await axios.post(
-        `${API_URL}/auth/register`,
-        {
-          name,
-          email,
-          password,
-        }
-      );
+    toast.success("Account created successfully!");
 
-      navigate("/login");
-    } catch (err) {
-      setError(err.response?.data?.message || "Something went wrong");
-    }
-  };
+    navigate("/login");
+
+  } catch (error) {
+    toast.error(
+      error.response?.data?.message ||
+      "Registration failed"
+    );
+
+    console.log(error.response?.data);
+  }
+};
   return (
 
     <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center px-6">
@@ -78,7 +85,7 @@ function Signup() {
           )}
           <button
             type="submit"
-            className="w-full bg-blue-600 py-3 rounded-lg hover:bg-blue-700 transition"
+          className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 py-3 rounded-xl hover:scale-[1.02] transition-all duration-200 font-semibold shadow-lg"
           >
             Sign Up
           </button>

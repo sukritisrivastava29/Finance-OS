@@ -3,9 +3,18 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { API_URL } from "../config";
 import AddTransactionModal from "../components/AddTransactionModal";
+import {
+  TrendingUp,
+  TrendingDown,
+  Wallet,
+  Search,
+  Pencil,
+  Trash2,
+} from "lucide-react";
 function Transactions() {
   const [transactions, setTransactions] = useState([]);
   const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(true);
 const [showModal, setShowModal] = useState(false);
 const [editingTransaction, setEditingTransaction] = useState(null);
   const token = localStorage.getItem("token");
@@ -33,6 +42,7 @@ const fetchSummary = async () => {
 
   const fetchTransactions = async () => {
     try {
+      setLoading(true);
       const { data } = await axios.get(
         `${API_URL}/transactions?q=${search}`,
         {
@@ -41,9 +51,10 @@ const fetchSummary = async () => {
           },
         }
       );
-
       setTransactions(data);
+      setLoading(false);
     } catch (error) {
+      setLoading(false);
       console.log(error);
     }
   };
@@ -99,6 +110,19 @@ const getCategoryEmoji = (category) => {
 useEffect(() => {
   fetchTransactions();
 }, [search]);
+if (loading) {
+  return (
+    <div className="min-h-screen bg-slate-950 text-white flex">
+      <Sidebar />
+
+      <div className="flex-1 flex items-center justify-center">
+        <p className="text-slate-400 text-lg">
+          Loading transactions...
+        </p>
+      </div>
+    </div>
+  );
+}
   return (
     <div className="min-h-screen bg-slate-950 text-white flex">
       <Sidebar />
@@ -118,7 +142,7 @@ useEffect(() => {
     setEditingTransaction(null);
     setShowModal(true);
   }}
-  className="bg-blue-600 px-4 py-2 rounded-lg hover:bg-blue-700"
+  className="bg-gradient-to-r from-blue-600 to-indigo-600 px-5 py-2.5 rounded-xl hover:scale-105 transition-all duration-200 font-medium shadow-lg"
 >
   + Add Transaction
 </button>
@@ -126,45 +150,85 @@ useEffect(() => {
 
       {/* Summary Cards */}
 <div className="grid md:grid-cols-3 gap-6 mb-8">
-  <div className="bg-slate-900 rounded-xl p-6">
-    <p className="text-slate-400">
-      Total Income
-    </p>
+  <div className="bg-slate-900 rounded-2xl p-6 shadow-lg hover:shadow-green-500/20 hover:-translate-y-1 transition-all duration-300">
+  <div className="flex items-center gap-4">
+    <div className="bg-green-500/20 p-4 rounded-xl">
+      <TrendingUp
+        size={30}
+        className="text-green-400"
+      />
+    </div>
 
-    <h2 className="text-3xl font-bold text-green-400 mt-2">
-      ₹{summary.income}
-    </h2>
-  </div>
+    <div>
+      <p className="text-slate-400">
+        Total Income
+      </p>
 
-  <div className="bg-slate-900 rounded-xl p-6">
-    <p className="text-slate-400">
-      Total Expenses
-    </p>
-
-    <h2 className="text-3xl font-bold text-red-400 mt-2">
-      ₹{summary.expense}
-    </h2>
-  </div>
-
-  <div className="bg-slate-900 rounded-xl p-6">
-    <p className="text-slate-400">
-      Net Balance
-    </p>
-
-    <h2 className="text-3xl font-bold mt-2">
-      ₹{summary.balance}
-    </h2>
+      <h2 className="text-3xl font-bold text-green-400 mt-2">
+        ₹{summary.income.toLocaleString("en-IN")}
+      </h2>
+    </div>
   </div>
 </div>
 
+<div className="bg-slate-900 rounded-2xl p-6 shadow-lg hover:shadow-red-500/20 hover:-translate-y-1 transition-all duration-300">
+  <div className="flex items-center gap-4">
+    <div className="bg-red-500/20 p-4 rounded-xl">
+      <TrendingDown
+        size={30}
+        className="text-red-400"
+      />
+    </div>
+
+    <div>
+      <p className="text-slate-400">
+        Total Expenses
+      </p>
+
+      <h2 className="text-3xl font-bold text-red-400 mt-2">
+        ₹{summary.expense.toLocaleString("en-IN")}
+      </h2>
+    </div>
+  </div>
+</div>
+
+ <div className="bg-slate-900 rounded-2xl p-6 shadow-lg hover:shadow-blue-500/20 hover:-translate-y-1 transition-all duration-300">
+  <div className="flex items-center gap-4">
+    <div className="bg-blue-500/20 p-4 rounded-xl">
+      <Wallet
+        size={30}
+        className="text-blue-400"
+      />
+    </div>
+
+    <div>
+      <p className="text-slate-400">
+        Net Balance
+      </p>
+
+      <h2 className="text-3xl font-bold text-blue-400 mt-2">
+        ₹{summary.balance.toLocaleString("en-IN")}
+      </h2>
+    </div>
+  </div>
+</div>
+</div>
+
         {/* Search Box */}
-        <input
-          type="text"
-          placeholder="🔍 Search transactions.."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="w-full bg-slate-900 rounded-xl p-4 mb-6 outline-none"
-        />
+        <div className="relative mb-6">
+  <Search
+    size={20}
+    className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+  />
+
+  <input
+    type="text"
+    placeholder="Search transactions..."
+    value={search}
+    onChange={(e) => setSearch(e.target.value)}
+    className="w-full bg-slate-900 border border-slate-700 rounded-xl py-4 pl-12 pr-4 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
+  />
+</div>
 
         {/* Transactions Table */}
         <div className="bg-slate-900 rounded-xl p-6">
@@ -184,14 +248,14 @@ useEffect(() => {
   transactions.map((transaction) => (
     <div
       key={transaction._id}
-      className="grid grid-cols-5 py-4 border-b border-slate-800 items-center"
+     className="grid grid-cols-5 py-4 border-b border-slate-800 items-center hover:bg-slate-800 rounded-lg transition-all duration-200"
     >
       <p>{transaction.title}</p>
 
-     <p>
-  {getCategoryEmoji(transaction.category)}{" "}
+   <span className="inline-flex items-center gap-2 bg-slate-800 px-3 py-1 rounded-full text-sm">
+  {getCategoryEmoji(transaction.category)}
   {transaction.category}
-</p>
+</span>
 <p
   className={`font-semibold flex items-center gap-2 ${
     transaction.type === "income"
@@ -217,16 +281,18 @@ useEffect(() => {
           }}
           className="text-blue-400 hover:text-blue-600"
         >
-          ✏️
+          <Pencil size={18} />
         </button>
 
         <button
-          onClick={() =>
-            deleteTransaction(transaction._id)
-          }
+          onClick={() => {
+  if (window.confirm("Delete this transaction?")) {
+    deleteTransaction(transaction._id);
+  }
+}}
           className="text-red-500 hover:text-red-700"
         >
-          🗑️
+         <Trash2 size={18} />
         </button>
       </div>
     </div>

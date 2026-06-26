@@ -6,6 +6,16 @@ import Sidebar from "../components/Sidebar";
 import AddTransactionModal from "../components/AddTransactionModal";
 import { API_URL } from "../config";
 import { useNavigate } from "react-router-dom";
+import {
+  TrendingUp,
+  TrendingDown,
+  Wallet,
+  Search,
+  Plus,
+  Pencil,
+  Trash2,
+} from "lucide-react";
+import toast from "react-hot-toast";
 function Dashboards() {
   const [editingTransaction, setEditingTransaction] = useState(null);
   const [transactions, setTransactions] = useState([]);
@@ -86,9 +96,14 @@ const deleteTransaction = async (id) => {
         },
       }
     );
+
+    toast.success("Transaction deleted");
+
     fetchTransactions();
     fetchSummary();
+
   } catch (error) {
+    toast.error("Failed to delete transaction");
     console.log(error);
   }
 };
@@ -122,52 +137,82 @@ useEffect(() => {
             </p>
           </div>
 
-          <button
-            onClick={() => setShowModal(true)}
-            className="bg-blue-600 px-4 py-2 rounded-lg hover:bg-blue-700"
-          >
-           ➕ Add Transaction
-          </button>
+       <button
+  onClick={() => {
+    setEditingTransaction(null);
+    setShowModal(true);
+  }}
+  className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 px-5 py-3 rounded-xl shadow-lg hover:scale-105 transition-all"
+>
+  <Plus size={18} />
+  Add Transaction
+</button>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid md:grid-cols-3 gap-6 mb-10">
-
-          <div className="bg-slate-900 rounded-xl p-6">
-            <p className="text-slate-400">
-              Total Balance
-            </p>
-
-            <h2 className="text-3xl font-bold mt-2">
-              ₹{summary.balance}
-            </h2>
-
-          </div>
-
-          <div className="bg-slate-900 rounded-xl p-6">
-            <p className="text-slate-400">
-              Monthly Spending
-            </p>
-
-            <h2 className="text-3xl font-bold mt-2">
-              ₹{summary.expense}
-            </h2>
-
-      
-          </div>
-
-          <div className="bg-slate-900 rounded-xl p-6">
-            <p className="text-slate-400">
-              Savings
-            </p>
-
-            <h2 className="text-3xl font-bold mt-2">
-              ₹{summary.income}
-            </h2>
-
+        <div className="grid md:grid-cols-3 gap-6 mb-8">
+          <div className="bg-slate-900 rounded-2xl p-6 shadow-lg hover:shadow-green-500/20 hover:-translate-y-1 transition-all duration-300">
+          <div className="flex items-center gap-4">
+            <div className="bg-green-500/20 p-4 rounded-xl">
+              <TrendingUp
+                size={30}
+                className="text-green-400"
+              />
+            </div>
         
+            <div>
+              <p className="text-slate-400">
+                Total Income
+              </p>
+        
+              <h2 className="text-3xl font-bold text-green-400 mt-2">
+                ₹{summary.income.toLocaleString("en-IN")}
+              </h2>
+            </div>
           </div>
-
+        </div>
+        
+        <div className="bg-slate-900 rounded-2xl p-6 shadow-lg hover:shadow-red-500/20 hover:-translate-y-1 transition-all duration-300">
+          <div className="flex items-center gap-4">
+            <div className="bg-red-500/20 p-4 rounded-xl">
+              <TrendingDown
+                size={30}
+                className="text-red-400"
+              />
+            </div>
+        
+            <div>
+              <p className="text-slate-400">
+                Total Expenses
+              </p>
+        
+              <h2 className="text-3xl font-bold text-red-400 mt-2">
+                ₹{summary.expense.toLocaleString("en-IN")}
+              </h2>
+            </div>
+          </div>
+        </div>
+        
+         <div className="bg-slate-900 rounded-2xl p-6 shadow-lg hover:shadow-blue-500/20 hover:-translate-y-1 transition-all duration-300">
+          <div className="flex items-center gap-4">
+            <div className="bg-blue-500/20 p-4 rounded-xl">
+              <Wallet
+                size={30}
+                className="text-blue-400"
+              />
+            </div>
+        
+            <div>
+              <p className="text-slate-400">
+                Net Balance
+              </p>
+        
+              <h2 className="text-3xl font-bold text-blue-400 mt-2">
+                ₹{summary.balance.toLocaleString("en-IN")}
+              </h2>
+            </div>
+          </div>
+        </div>
         </div>
 
         {/* Recent Transactions */}
@@ -217,13 +262,13 @@ useEffect(() => {
   }}
   className="text-blue-400 hover:text-blue-600"
 >
-  ✏️
+  <Pencil size={18} />
 </button>
     <button
       onClick={() => deleteTransaction(transaction._id)}
       className="text-red-500 hover:text-red-700"
     >
-      🗑️
+     <Trash2 size={18} />
     </button>
   </div>
 </div>

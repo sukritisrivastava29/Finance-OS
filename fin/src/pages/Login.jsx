@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import axios from "axios";
 import { API_URL } from "../config";
+import toast from "react-hot-toast";
 function Login() {
   const navigate = useNavigate();
 
@@ -9,33 +10,34 @@ function Login() {
   const [password, setPassword] = useState("");
 
   const handleLogin = async () => {
-    try {
-      const { data } = await axios.post(
-        `${API_URL}/auth/login`,
-        {
-          email,
-          password,
-        }
-      );
+  try {
+    const { data } = await axios.post(
+      `${API_URL}/auth/login`,
+      {
+        email,
+        password,
+      }
+    );
 
-      localStorage.setItem("token", data.token);
+    localStorage.setItem("token", data.token);
+    localStorage.setItem(
+      "user",
+      JSON.stringify(data.user)
+    );
 
-      localStorage.setItem(
-        "user",
-        JSON.stringify(data.user)
-      );
+    toast.success("Welcome back!");
 
-      navigate("/dashboard");
-    } catch (error) {
-      console.log(error.response?.data);
+    navigate("/dashboard");
 
-      alert(
-        error.response?.data?.message ||
-          "Login failed"
-      );
-    }
-  };
+  } catch (error) {
+    toast.error(
+      error.response?.data?.message ||
+      "Invalid email or password"
+    );
 
+    console.log(error.response?.data);
+  }
+};
   return (
     <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center px-6">
       <div className="bg-slate-900 p-8 rounded-xl w-full max-w-md">
@@ -76,7 +78,7 @@ function Login() {
 
           <button
   type="submit"
-  className="w-full bg-blue-600 py-3 rounded-lg hover:bg-blue-700 transition"
+  className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 py-3 rounded-xl hover:scale-[1.02] transition-all duration-200 font-semibold shadow-lg"
 >
   Login
 </button>
