@@ -45,9 +45,25 @@ const updateTransaction = async (req, res) => {
 };
 const getTransactions = async (req, res) => {
   try {
-    const transactions = await Transaction.find({
-      user: req.user.id,
-    });
+     const { q } = req.query;
+
+        // Base filter: only fetch logged-in user's transactions
+        const filter = {
+            user: req.user.id,
+        };
+
+        // If user searched for something, filter by title
+        if (q) {
+            filter.title = {
+                $regex: q,
+                $options: "i", // Case-insensitive search
+            };
+        }
+
+        // Fetch transactions using the filter
+        const transactions = await Transaction.find(filter).sort({
+            date: -1,
+        });
 
     res.status(200).json(transactions);
   } catch (error) {

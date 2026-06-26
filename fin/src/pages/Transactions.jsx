@@ -1,33 +1,59 @@
 import Sidebar from "../components/Sidebar";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { API_URL } from "../config";
 
 function Transactions() {
-  const transactions = [
-    {
-      id: 1,
-      title: "Netflix Subscription",
-      amount: -499,
-      date: "15 Jun 2026",
-    },
-    {
-      id: 2,
-      title: "Salary Credit",
-      amount: 45000,
-      date: "14 Jun 2026",
-    },
-    {
-      id: 3,
-      title: "Grocery Shopping",
-      amount: -1200,
-      date: "13 Jun 2026",
-    },
-    {
-      id: 4,
-      title: "Petrol",
-      amount: -800,
-      date: "12 Jun 2026",
-    },
-  ];
+  const [transactions, setTransactions] = useState([]);
+  const [search, setSearch] = useState("");
 
+  const token = localStorage.getItem("token");
+  const [summary, setSummary] = useState({
+  income: 0,
+  expense: 0,
+  balance: 0,
+});
+const fetchSummary = async () => {
+  try {
+    const { data } = await axios.get(
+      `${API_URL}/transactions/summary`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    setSummary(data);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+  const fetchTransactions = async () => {
+    try {
+      const { data } = await axios.get(
+        `${API_URL}/transactions?q=${search}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setTransactions(data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+ useEffect(() => {
+  fetchSummary();
+}, []);
+
+useEffect(() => {
+  fetchTransactions();
+}, [search]);
   return (
     <div className="min-h-screen bg-slate-950 text-white flex">
       <Sidebar />
@@ -43,43 +69,45 @@ function Transactions() {
           </button>
         </div>
 
-        {/* Summary Cards */}
-        <div className="grid md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-slate-900 rounded-xl p-6">
-            <p className="text-slate-400">
-              Total Income
-            </p>
+      {/* Summary Cards */}
+<div className="grid md:grid-cols-3 gap-6 mb-8">
+  <div className="bg-slate-900 rounded-xl p-6">
+    <p className="text-slate-400">
+      Total Income
+    </p>
 
-            <h2 className="text-3xl font-bold text-green-400 mt-2">
-              ₹45,000
-            </h2>
-          </div>
+    <h2 className="text-3xl font-bold text-green-400 mt-2">
+      ₹{summary.income}
+    </h2>
+  </div>
 
-          <div className="bg-slate-900 rounded-xl p-6">
-            <p className="text-slate-400">
-              Total Expenses
-            </p>
+  <div className="bg-slate-900 rounded-xl p-6">
+    <p className="text-slate-400">
+      Total Expenses
+    </p>
 
-            <h2 className="text-3xl font-bold text-red-400 mt-2">
-              ₹2,499
-            </h2>
-          </div>
+    <h2 className="text-3xl font-bold text-red-400 mt-2">
+      ₹{summary.expense}
+    </h2>
+  </div>
 
-          <div className="bg-slate-900 rounded-xl p-6">
-            <p className="text-slate-400">
-              Net Balance
-            </p>
+  <div className="bg-slate-900 rounded-xl p-6">
+    <p className="text-slate-400">
+      Net Balance
+    </p>
 
-            <h2 className="text-3xl font-bold mt-2">
-              ₹42,501
-            </h2>
-          </div>
-        </div>
+    <h2 className="text-3xl font-bold mt-2">
+      ₹{summary.balance}
+    </h2>
+  </div>
+</div>
 
         {/* Search Box */}
         <input
           type="text"
           placeholder="Search transactions..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
           className="w-full bg-slate-900 rounded-xl p-4 mb-6 outline-none"
         />
 
@@ -91,26 +119,35 @@ function Transactions() {
             <p>Date</p>
           </div>
 
-          {transactions.map((transaction) => (
-            <div
-              key={transaction.id}
-              className="grid grid-cols-3 py-4 border-b border-slate-800"
-            >
-              <p>{transaction.title}</p>
-
-              <p
-                className={
-                  transaction.amount > 0
-                    ? "text-green-400"
-                    : "text-red-400"
-                }
+          {transactions.length === 0 ? (
+            <p className="text-center text-slate-400 py-6">
+              No transactions found.
+            </p>
+          ) : (
+            transactions.map((transaction) => (
+              <div
+                key={transaction._id}
+                className="grid grid-cols-3 py-4 border-b border-slate-800"
               >
-                ₹{transaction.amount}
-              </p>
+                <p>{transaction.title}</p>
 
-              <p>{transaction.date}</p>
-            </div>
-          ))}
+                <p
+                  className={
+                    transaction.type === "income"
+                      ? "text-green-400"
+                      : "text-red-400"
+                  }
+                >
+                  {transaction.type === "income" ? "+" : "-"}₹
+                  {transaction.amount}
+                </p>
+
+                <p>
+                  {new Date(transaction.date).toLocaleDateString()}
+                </p>
+              </div>
+            ))
+          )}
         </div>
       </div>
     </div>

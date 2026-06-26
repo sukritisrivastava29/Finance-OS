@@ -5,11 +5,13 @@ import axios from "axios";
 import Sidebar from "../components/Sidebar";
 import AddTransactionModal from "../components/AddTransactionModal";
 import { API_URL } from "../config";
+import { useNavigate } from "react-router-dom";
 function Dashboards() {
   const [editingTransaction, setEditingTransaction] = useState(null);
   const [transactions, setTransactions] = useState([]);
   const token = localStorage.getItem("token");
   console.log("Token:", token);
+  const navigate=useNavigate();
   const user = JSON.parse(
     localStorage.getItem("user")
   );
@@ -92,10 +94,16 @@ const deleteTransaction = async (id) => {
 };
 
 useEffect(() => {
+   const token = localStorage.getItem("token");
+
+  if (!token) {
+    navigate("/login");
+    return;
+  }
   fetchTransactions();
   fetchSummary();
   fetchAnalytics();
-}, []);
+}, [navigate]);
 
   return (
     <div className="min-h-screen bg-slate-950 text-white flex">
@@ -178,7 +186,7 @@ useEffect(() => {
          <div className="space-y-4">
   {transactions.length === 0 ? (
     <p className="text-center text-slate-400 py-8">
-      No transactions yet. Click "Add Transaction" to get started.
+      No transactions yet. Click "Add Transaction" to add your first expense.
     </p>
   ) : (
     transactions.map((transaction) => (
@@ -239,7 +247,10 @@ useEffect(() => {
       {showModal && (
       <AddTransactionModal
   transaction={editingTransaction}
-  onClose={() => setShowModal(false)}
+  onClose={() => {
+  setShowModal(false);
+  setEditingTransaction(null);
+}}
   refreshTransactions={() => {
     fetchTransactions();
     fetchSummary();
