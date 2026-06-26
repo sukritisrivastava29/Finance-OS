@@ -118,7 +118,7 @@ useEffect(() => {
             </h1>
 
             <p className="text-slate-400">
-              Welcome back, {user?.name}
+             👋 Welcome back, {user?.name}
             </p>
           </div>
 
@@ -126,7 +126,7 @@ useEffect(() => {
             onClick={() => setShowModal(true)}
             className="bg-blue-600 px-4 py-2 rounded-lg hover:bg-blue-700"
           >
-            + Add Transaction
+           ➕ Add Transaction
           </button>
         </div>
 
@@ -142,9 +142,6 @@ useEffect(() => {
               ₹{summary.balance}
             </h2>
 
-            <p className="text-green-400 mt-2">
-              ↑ 12% from last month
-            </p>
           </div>
 
           <div className="bg-slate-900 rounded-xl p-6">
@@ -156,9 +153,7 @@ useEffect(() => {
               ₹{summary.expense}
             </h2>
 
-            <p className="text-red-400 mt-2">
-              ↑ 5% from last month
-            </p>
+      
           </div>
 
           <div className="bg-slate-900 rounded-xl p-6">
@@ -170,9 +165,7 @@ useEffect(() => {
               ₹{summary.income}
             </h2>
 
-            <p className="text-green-400 mt-2">
-              ↑ 18% from last month
-            </p>
+        
           </div>
 
         </div>
@@ -186,7 +179,7 @@ useEffect(() => {
          <div className="space-y-4">
   {transactions.length === 0 ? (
     <p className="text-center text-slate-400 py-8">
-      No transactions yet. Click "Add Transaction" to add your first expense.
+     📭No transactions yet. Click "Add Transaction" to add your first expense.
     </p>
   ) : (
     transactions.map((transaction) => (
@@ -202,16 +195,20 @@ useEffect(() => {
   </div>
 
   <div className="flex items-center gap-4">
-    <p
-      className={
-        transaction.type === "income"
-          ? "text-green-400"
-          : "text-red-400"
-      }
-    >
-      {transaction.type === "income" ? "+" : "-"}₹
-      {transaction.amount}
-    </p>
+   <p
+  className={`font-semibold flex items-center gap-2 ${
+    transaction.type === "income"
+      ? "text-green-400"
+      : "text-red-400"
+  }`}
+>
+  {transaction.type === "income" ? "📈" : "📉"}
+
+  {transaction.type === "income"
+    ? "+"
+    : "-"}
+  ₹{transaction.amount}
+</p>
 
 <button
   onClick={() => {

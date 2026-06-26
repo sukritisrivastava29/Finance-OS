@@ -65,6 +65,32 @@ const fetchSummary = async () => {
     console.log(error);
   }
 };
+const getCategoryEmoji = (category) => {
+  switch (category.toLowerCase()) {
+    case "food":
+      return "🍔";
+    case "transport":
+      return "🚗";
+    case "salary":
+      return "💼";
+    case "shopping":
+      return "🛍️";
+    case "health":
+      return "🏥";
+    case "education":
+      return "📚";
+    case "entertainment":
+      return "🎬";
+    case "bills":
+      return "🧾";
+    case "investment":
+      return "📈";
+    case "travel":
+      return "✈️";
+    default:
+      return "📦";
+  }
+};
 
  useEffect(() => {
   fetchSummary();
@@ -79,9 +105,13 @@ useEffect(() => {
 
       <div className="flex-1 p-10">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold">
-            Transactions
-          </h1>
+          <h1 className="text-4xl font-bold tracking-tight">
+               Transactions
+             </h1>
+         
+             <p className="text-slate-400 mt-2">
+               Manage all your income and expenses in one place.
+             </p>
 
          <button
   onClick={() => {
@@ -130,7 +160,7 @@ useEffect(() => {
         {/* Search Box */}
         <input
           type="text"
-          placeholder="Search transactions..."
+          placeholder="🔍 Search transactions.."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="w-full bg-slate-900 rounded-xl p-4 mb-6 outline-none"
@@ -139,11 +169,11 @@ useEffect(() => {
         {/* Transactions Table */}
         <div className="bg-slate-900 rounded-xl p-6">
         <div className="grid grid-cols-5 font-semibold border-b border-slate-700 pb-4 mb-4">
-  <p>Description</p>
-  <p>Category</p>
-  <p>Amount</p>
-  <p>Date</p>
-  <p>Actions</p>
+  <p>📝 Description</p>
+  <p>🏷️ Category</p>
+  <p>💵 Amount</p>
+  <p>📅 Date</p>
+  <p>⚙️ Actions</p>
 </div>
 
          {transactions.length === 0 ? (
@@ -158,18 +188,22 @@ useEffect(() => {
     >
       <p>{transaction.title}</p>
 
-      <p>{transaction.category}</p>
+     <p>
+  {getCategoryEmoji(transaction.category)}{" "}
+  {transaction.category}
+</p>
+<p
+  className={`font-semibold flex items-center gap-2 ${
+    transaction.type === "income"
+      ? "text-green-400"
+      : "text-red-400"
+  }`}
+>
+  {transaction.type === "income" ? "📈" : "📉"}
 
-      <p
-        className={
-          transaction.type === "income"
-            ? "text-green-400"
-            : "text-red-400"
-        }
-      >
-        {transaction.type === "income" ? "+" : "-"}₹
-        {transaction.amount}
-      </p>
+  {transaction.type === "income" ? "+" : "-"}₹
+  {transaction.amount}
+</p>
 
       <p>
         {new Date(transaction.date).toLocaleDateString()}
