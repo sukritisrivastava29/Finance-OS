@@ -2,11 +2,12 @@ import Sidebar from "../components/Sidebar";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { API_URL } from "../config";
-
+import AddTransactionModal from "../components/AddTransactionModal";
 function Transactions() {
   const [transactions, setTransactions] = useState([]);
   const [search, setSearch] = useState("");
-
+const [showModal, setShowModal] = useState(false);
+const [editingTransaction, setEditingTransaction] = useState(null);
   const token = localStorage.getItem("token");
   const [summary, setSummary] = useState({
   income: 0,
@@ -47,6 +48,24 @@ const fetchSummary = async () => {
     }
   };
 
+  const deleteTransaction = async (id) => {
+  try {
+    await axios.delete(
+      `${API_URL}/transactions/${id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    fetchTransactions();
+    fetchSummary();
+  } catch (error) {
+    console.log(error);
+  }
+};
+
  useEffect(() => {
   fetchSummary();
 }, []);
@@ -64,9 +83,15 @@ useEffect(() => {
             Transactions
           </h1>
 
-          <button className="bg-blue-600 px-4 py-2 rounded-lg hover:bg-blue-700">
-            Add Transaction
-          </button>
+         <button
+  onClick={() => {
+    setEditingTransaction(null);
+    setShowModal(true);
+  }}
+  className="bg-blue-600 px-4 py-2 rounded-lg hover:bg-blue-700"
+>
+  + Add Transaction
+</button>
         </div>
 
       {/* Summary Cards */}
@@ -113,43 +138,83 @@ useEffect(() => {
 
         {/* Transactions Table */}
         <div className="bg-slate-900 rounded-xl p-6">
-          <div className="grid grid-cols-3 font-semibold border-b border-slate-700 pb-4 mb-4">
-            <p>Description</p>
-            <p>Amount</p>
-            <p>Date</p>
-          </div>
+        <div className="grid grid-cols-5 font-semibold border-b border-slate-700 pb-4 mb-4">
+  <p>Description</p>
+  <p>Category</p>
+  <p>Amount</p>
+  <p>Date</p>
+  <p>Actions</p>
+</div>
 
-          {transactions.length === 0 ? (
-            <p className="text-center text-slate-400 py-6">
-              No transactions found.
-            </p>
-          ) : (
-            transactions.map((transaction) => (
-              <div
-                key={transaction._id}
-                className="grid grid-cols-3 py-4 border-b border-slate-800"
-              >
-                <p>{transaction.title}</p>
+         {transactions.length === 0 ? (
+  <p className="text-center text-slate-400 py-6">
+    No transactions found.
+  </p>
+) : (
+  transactions.map((transaction) => (
+    <div
+      key={transaction._id}
+      className="grid grid-cols-5 py-4 border-b border-slate-800 items-center"
+    >
+      <p>{transaction.title}</p>
 
-                <p
-                  className={
-                    transaction.type === "income"
-                      ? "text-green-400"
-                      : "text-red-400"
-                  }
-                >
-                  {transaction.type === "income" ? "+" : "-"}₹
-                  {transaction.amount}
-                </p>
+      <p>{transaction.category}</p>
 
-                <p>
-                  {new Date(transaction.date).toLocaleDateString()}
-                </p>
-              </div>
-            ))
-          )}
+      <p
+        className={
+          transaction.type === "income"
+            ? "text-green-400"
+            : "text-red-400"
+        }
+      >
+        {transaction.type === "income" ? "+" : "-"}₹
+        {transaction.amount}
+      </p>
+
+      <p>
+        {new Date(transaction.date).toLocaleDateString()}
+      </p>
+
+      <div className="flex gap-4">
+        <button
+          onClick={() => {
+            setEditingTransaction(transaction);
+            setShowModal(true);
+          }}
+          className="text-blue-400 hover:text-blue-600"
+        >
+          ✏️
+        </button>
+
+        <button
+          onClick={() =>
+            deleteTransaction(transaction._id)
+          }
+          className="text-red-500 hover:text-red-700"
+        >
+          🗑️
+        </button>
+      </div>
+    </div>
+  ))
+)}
         </div>
       </div>
+      {showModal && (
+  <AddTransactionModal
+    transaction={editingTransaction}
+    onClose={() => {
+      setShowModal(false);
+      setEditingTransaction(null);
+    }}
+    refreshTransactions={() => {
+      fetchTransactions();
+      fetchSummary();
+      setShowModal(false);
+      setEditingTransaction(null);
+    }}
+  />
+)}
     </div>
   );
 }
