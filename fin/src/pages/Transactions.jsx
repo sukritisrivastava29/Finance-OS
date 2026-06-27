@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { API_URL } from "../config";
 import AddTransactionModal from "../components/AddTransactionModal";
+import { generatePDF } from "../utils/generatePDF";
 import {
   TrendingUp,
   TrendingDown,
@@ -128,25 +129,44 @@ if (loading) {
       <Sidebar />
 
       <div className="flex-1 p-10">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-4xl font-bold tracking-tight">
-               Transactions
-             </h1>
-         
-             <p className="text-slate-400 mt-2">
-               Manage all your income and expenses in one place.
-             </p>
+       <div className="flex justify-between items-start mb-8">
 
-         <button
-  onClick={() => {
-    setEditingTransaction(null);
-    setShowModal(true);
-  }}
-  className="bg-gradient-to-r from-blue-600 to-indigo-600 px-5 py-2.5 rounded-xl hover:scale-105 transition-all duration-200 font-medium shadow-lg"
->
-  + Add Transaction
-</button>
-        </div>
+  <div>
+    <h1 className="text-4xl font-bold tracking-tight">
+      Transactions
+    </h1>
+
+    <p className="text-slate-400 mt-2">
+      Manage all your income and expenses in one place.
+    </p>
+  </div>
+
+  <div className="flex gap-3">
+    <button
+      onClick={() =>
+        generatePDF(
+          transactions,
+          summary,
+          JSON.parse(localStorage.getItem("user"))
+        )
+      }
+      className="bg-green-600 px-5 py-2 rounded-xl hover:bg-green-700 transition"
+    >
+      📄 Download PDF
+    </button>
+
+    <button
+      onClick={() => {
+        setEditingTransaction(null);
+        setShowModal(true);
+      }}
+      className="bg-blue-600 px-5 py-2 rounded-xl hover:bg-blue-700 transition"
+    >
+      + Add Transaction
+    </button>
+  </div>
+
+</div>
 
       {/* Summary Cards */}
 <div className="grid md:grid-cols-3 gap-6 mb-8">
