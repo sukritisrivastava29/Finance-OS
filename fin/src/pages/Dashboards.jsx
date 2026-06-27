@@ -3,9 +3,11 @@ import MonthlyChart from "../components/MonthlyChart";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Sidebar from "../components/Sidebar";
+import { FileDown } from "lucide-react";
 import AddTransactionModal from "../components/AddTransactionModal";
 import { API_URL } from "../config";
 import { useNavigate } from "react-router-dom";
+import { generatePDF } from "../utils/generatePDF";
 import {
   TrendingUp,
   TrendingDown,
@@ -125,29 +127,38 @@ useEffect(() => {
       <Sidebar />
 
       <div className="flex-1 p-10">
+<div className="flex justify-between items-center mb-8">
+  <div>
+    <h1 className="text-3xl font-bold">
+      Dashboard
+    </h1>
 
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-3xl font-bold">
-              Dashboard
-            </h1>
+    <p className="text-slate-400">
+      👋 Welcome back, {user?.name}
+    </p>
+  </div>
 
-            <p className="text-slate-400">
-             👋 Welcome back, {user?.name}
-            </p>
-          </div>
-
-       <button
-  onClick={() => {
-    setEditingTransaction(null);
-    setShowModal(true);
-  }}
-  className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 px-5 py-3 rounded-xl shadow-lg hover:scale-105 transition-all"
+  <div className="flex gap-3">
+   <button
+  onClick={() => generatePDF(transactions, summary, user)}
+  className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 px-5 py-3 rounded-xl shadow-lg hover:scale-105 transition-all"
 >
-  <Plus size={18} />
-  Add Transaction
+  <FileDown size={18} />
+  Export PDF
 </button>
-        </div>
+
+    <button
+      onClick={() => {
+        setEditingTransaction(null);
+        setShowModal(true);
+      }}
+      className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 px-5 py-3 rounded-xl shadow-lg hover:scale-105 transition-all"
+    >
+      <Plus size={18} />
+      Add Transaction
+    </button>
+  </div>
+</div>
 
         {/* Stats Cards */}
         <div className="grid md:grid-cols-3 gap-6 mb-8">

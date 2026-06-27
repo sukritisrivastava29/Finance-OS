@@ -1,115 +1,237 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-export const generatePDF = (
-    transactions,
-    summary,
-    user
-) => {
-const doc=new jsPDF();
-doc.setFontSize(24);
-doc.setTextColor(37, 99, 235);
-doc.text("FinanceOS", 14, 20);
 
-doc.setFontSize(16);
-doc.setTextColor(0, 0, 0);
-doc.text("Financial Report", 14, 30);
+export const generatePDF = (transactions, summary, user) => {
+  const doc = new jsPDF();
 
-doc.setDrawColor(37, 99, 235);
-doc.line(14, 35, 196, 35);
-doc.setFontSize(12);
+  // ==========================
+  // Colors
+  // ==========================
+  const primary = [37, 99, 235];
+  const green = [34, 197, 94];
+  const red = [239, 68, 68];
+  const blue = [59, 130, 246];
+  const dark = [30, 41, 59];
+  const lightGray = [245, 245, 245];
+
+  doc.setFont("helvetica", "normal");
+
+  // ==========================
+  // Header
+  // ==========================
+  doc.setFontSize(24);
+  doc.setTextColor(...primary);
+  doc.text("FinanceOS", 14, 20);
+
+  doc.setFontSize(16);
+  doc.setTextColor(...dark);
+  doc.text("Financial Report", 14, 30);
+
+  doc.setDrawColor(...primary);
+  doc.setLineWidth(0.7);
+  doc.line(14, 36, 196, 36);
+
+  doc.setFontSize(12);
+
+  doc.text(`User : ${user?.name || "Unknown"}`, 14, 48);
+  doc.text(`Email : ${user?.email || "-"}`, 14, 56);
+
+  doc.text(
+    `Generated : ${new Date().toLocaleString("en-IN")}`,
+    14,
+    64
+  );
+  const reportId = `FIN-${Date.now()}`;
 
 doc.text(
-  `User: ${user?.name || "Unknown"}`,
+  `Report ID : ${reportId}`,
   14,
-  48
+  72
 );
 
 doc.text(
-  `Email: ${user?.email || "-"}`,
-  14,
-  56
+  `Total Transactions : ${transactions.length}`,
+  140,
+  72
 );
 
-doc.text(
-  `Generated: ${new Date().toLocaleDateString(
-    "en-IN"
-  )}`,
-  14,
-  64
-);
-doc.setFontSize(15);
-doc.text("Summary", 14, 80);
+ 
+  doc.setFontSize(16);
+  doc.setTextColor(...dark);
+  doc.text("Financial Summary", 14, 82);
 
-doc.setFontSize(12);
+  const income = Number(summary?.income || 0);
+  const expense = Number(summary?.expense || 0);
+  const balance = Number(summary?.balance || 0);
 
-doc.text(
-  `Total Income : ₹${summary.income.toLocaleString(
-    "en-IN"
-  )}`,
-  20,
-  92
-);
+  doc.setFillColor(...green);
+  doc.roundedRect(14, 90, 56, 26, 3, 3, "F");
 
-doc.text(
-  `Total Expense : ₹${summary.expense.toLocaleString(
-    "en-IN"
-  )}`,
-  20,
-  100
-);
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(11);
+  doc.text("Total Income", 18, 100);
 
-doc.text(
-  `Net Balance : ₹${summary.balance.toLocaleString(
-    "en-IN"
-  )}`,
-  20,
-  108
-);
+  doc.setFontSize(14);
+  doc.text(
+    `INR ${income.toLocaleString("en-IN")}`,
+    18,
+    110
+  );
+
+  doc.setFillColor(...red);
+  doc.roundedRect(77, 90, 56, 26, 3, 3, "F");
+
+  doc.setFontSize(11);
+  doc.text("Total Expense", 81, 100);
+
+  doc.setFontSize(14);
+  doc.text(
+    `INR ${expense.toLocaleString("en-IN")}`,
+    81,
+    110
+  );
+
+  doc.setFillColor(...blue);
+  doc.roundedRect(140, 90, 56, 26, 3, 3, "F");
+
+  doc.setFontSize(11);
+  doc.text("Net Balance", 144, 100);
+
+  doc.setFontSize(14);
+  doc.text(
+    `INR ${balance.toLocaleString("en-IN")}`,
+    144,
+    110
+  );
+  if (transactions.length === 0) {
+  doc.setFontSize(13);
+  doc.setTextColor(...dark);
+
+  doc.text(
+    "No transactions available for this report.",
+    14,
+    135
+  );
+} else {
+
 const tableData = transactions.map((transaction) => [
-  transaction.title,
-  transaction.category,
-  transaction.type,
-  `${transaction.type === "income" ? "+" : "-"}₹${transaction.amount}`,
-  new Date(transaction.date).toLocaleDateString("en-IN"),
-]);
-autoTable(doc, {
-  startY: 120,
+    transaction.title,
+    transaction.category,
+    transaction.type,
+    `${
+      transaction.type === "income" ? "+" : "-"
+    }INR ${Number(transaction.amount).toLocaleString("en-IN")}`,
+    new Date(transaction.date).toLocaleDateString("en-IN"),
+  ]);
 
-  head: [[
-    "Title",
-    "Category",
-    "Type",
-    "Amount",
-    "Date",
-  ]],
+  autoTable(doc, {
 
-  body: tableData,
+    startY: 128,
 
-  headStyles: {
-    fillColor: [37, 99, 235],
-    textColor: [255, 255, 255],
-    fontStyle: "bold",
-  },
+    head: [[
+      "Title",
+      "Category",
+      "Type",
+      "Amount",
+      "Date",
+    ]],
 
-  alternateRowStyles: {
-    fillColor: [245, 245, 245],
-  },
+    body: tableData,
 
-  styles: {
-    fontSize: 10,
-    cellPadding: 3,
-  },
+    theme: "striped",
+
+    headStyles: {
+      fillColor: primary,
+      textColor: [255, 255, 255],
+      fontStyle: "bold",
+      halign: "center",
+      fontSize: 11,
+    },
+
+    bodyStyles: {
+      fontSize: 10,
+      textColor: dark,
+    },
+
+    alternateRowStyles: {
+      fillColor: lightGray,
+    },
+
+    styles: {
+      cellPadding: 4,
+      overflow: "linebreak",
+      valign: "middle",
+    },
+
+    columnStyles: {
+      3: {
+        halign: "right",
+      },
+      4: {
+        halign: "center",
+      },
+    },
+    didParseCell: function (data) {
+
+  if (
+    data.section === "body" &&
+    data.column.index === 2
+  ) {
+
+    if (data.cell.raw === "income") {
+      data.cell.styles.textColor = green;
+      data.cell.styles.fontStyle = "bold";
+    }
+
+    if (data.cell.raw === "expense") {
+      data.cell.styles.textColor = red;
+      data.cell.styles.fontStyle = "bold";
+    }
+
+  }
+
+},
+  });
+}
+  const pages = doc.getNumberOfPages();
+
+  for (let i = 1; i <= pages; i++) {
+    doc.setPage(i);
+
+    const pageHeight = doc.internal.pageSize.height;
+
+    doc.setDrawColor(220);
+    doc.line(
+      14,
+      pageHeight - 16,
+      196,
+      pageHeight - 16
+    );
+
+    doc.setFontSize(10);
+    doc.setTextColor(120);
+
+    doc.text(
+      "Generated by FinanceOS",
+      14,
+      pageHeight - 8
+    );
+
+    doc.text(
+      `Page ${i} of ${pages}`,
+      170,
+      pageHeight - 8
+    );
+  }
+
+  const fileName = `FinanceOS_Report_${
+    new Date().toISOString().split("T")[0]
+  }.pdf`;
+doc.setProperties({
+  title: "FinanceOS Financial Report",
+  subject: "Expense Report",
+  author: "FinanceOS",
+  creator: "FinanceOS",
 });
-const pageHeight = doc.internal.pageSize.height;
-
-doc.setFontSize(10);
-
-doc.setTextColor(120);
-
-doc.text(
-  "Generated by FinanceOS",
-  14,
-  pageHeight - 10
-);
-doc.save("FinanceOS_Report.pdf");
+  doc.save(fileName);
 };
