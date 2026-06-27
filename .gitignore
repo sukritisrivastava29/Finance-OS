@@ -1,0 +1,19 @@
+# Dependencies
+node_modules/
+
+# Environment files
+.env
+.env.*
+financeos-backend/.env
+financeos-frontend/.env
+
+# Uploads
+uploads/
+financeos-backend/uploads/
+
+# Logs
+*.log
+
+# Build
+dist/
+dist-ssr/

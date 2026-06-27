@@ -22,3 +22,12 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+# Environment Variables
+.env
+.env.*
+financeos-backend/.env
+financeos-frontend/.env
+
+# Uploads
+uploads/
+financeos-backend/uploads/

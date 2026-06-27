@@ -2,6 +2,8 @@ import Sidebar from "../components/Sidebar";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { API_URL } from "../config";
+import ScanReceiptModal from "../components/ScanReceiptModal";
+import { Camera } from "lucide-react";
 import AddTransactionModal from "../components/AddTransactionModal";
 import { generatePDF } from "../utils/generatePDF";
 import {
@@ -142,6 +144,7 @@ if (loading) {
   </div>
 
   <div className="flex gap-3">
+    
     <button
       onClick={() =>
         generatePDF(
@@ -150,11 +153,21 @@ if (loading) {
           JSON.parse(localStorage.getItem("user"))
         )
       }
-      className="bg-green-600 px-5 py-2 rounded-xl hover:bg-green-700 transition"
-    >
-      📄 Download PDF
-    </button>
+     
+    className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 px-5 py-3 rounded-xl shadow-lg hover:scale-105 transition-all"
+  >
+    📄 Export PDF
+  </button>
 
+ <button
+    onClick={() =>
+      setShowScanner(true)
+    }
+    className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 px-5 py-3 rounded-xl shadow-lg hover:scale-105 transition-all"
+  >
+    <Camera size={18} />
+    Scan Receipt
+  </button>
     <button
       onClick={() => {
         setEditingTransaction(null);
