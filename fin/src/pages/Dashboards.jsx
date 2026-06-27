@@ -18,7 +18,10 @@ import {
   Trash2,
 } from "lucide-react";
 import toast from "react-hot-toast";
+import ScanReceiptModal from "../components/ScanReceiptModal";
+import { Camera } from "lucide-react";
 function Dashboards() {
+ 
   const [editingTransaction, setEditingTransaction] = useState(null);
   const [transactions, setTransactions] = useState([]);
   const token = localStorage.getItem("token");
@@ -37,7 +40,7 @@ function Dashboards() {
   monthlyIncomeExpense: [],
 });
   const [showModal, setShowModal] = useState(false);
-
+const [showScanner, setShowScanner] = useState(false);
   const fetchAnalytics = async () => {
     try {
       const { data } = await axios.get(
@@ -139,27 +142,43 @@ useEffect(() => {
   </div>
 
   <div className="flex gap-3">
-   <button
-  onClick={() => generatePDF(transactions, summary, user)}
-  className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 px-5 py-3 rounded-xl shadow-lg hover:scale-105 transition-all"
->
-  <FileDown size={18} />
-  Export PDF
-</button>
 
-    <button
-      onClick={() => {
-        setEditingTransaction(null);
-        setShowModal(true);
-      }}
-      className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 px-5 py-3 rounded-xl shadow-lg hover:scale-105 transition-all"
-    >
-      <Plus size={18} />
-      Add Transaction
-    </button>
-  </div>
+  <button
+    onClick={() =>
+      generatePDF(
+        transactions,
+        summary,
+        user
+      )
+    }
+    className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 px-5 py-3 rounded-xl shadow-lg hover:scale-105 transition-all"
+  >
+    📄 Export PDF
+  </button>
+
+  <button
+    onClick={() =>
+      setShowScanner(true)
+    }
+    className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 px-5 py-3 rounded-xl shadow-lg hover:scale-105 transition-all"
+  >
+    <Camera size={18} />
+    Scan Receipt
+  </button>
+
+  <button
+    onClick={() => {
+      setEditingTransaction(null);
+      setShowModal(true);
+    }}
+    className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 px-5 py-3 rounded-xl shadow-lg hover:scale-105 transition-all"
+  >
+    <Plus size={18} />
+    Add Transaction
+  </button>
+
 </div>
-
+</div>
         {/* Stats Cards */}
         <div className="grid md:grid-cols-3 gap-6 mb-8">
           <div className="bg-slate-900 rounded-2xl p-6 shadow-lg hover:shadow-green-500/20 hover:-translate-y-1 transition-all duration-300">
@@ -311,6 +330,16 @@ useEffect(() => {
   }}
 />
       )}
+      {showScanner && (
+  <ScanReceiptModal
+    onClose={() => setShowScanner(false)}
+    refreshTransactions={() => {
+        fetchTransactions();
+        fetchSummary();
+        fetchAnalytics();
+    }}
+/>
+)}
     </div>
   );
 }

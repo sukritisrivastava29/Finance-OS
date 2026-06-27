@@ -7,13 +7,18 @@ const transactionRoutes = require("./routes/transactionRoutes");
 const authRoutes = require("./routes/authRoutes");
 
 const app = express();
-
+const receiptRoutes = require(
+  "./routes/receiptRoutes"
+);
 app.use(cors());
 app.use(express.json());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/transactions", transactionRoutes);
-
+app.use(
+  "/api/receipt",
+  receiptRoutes
+);
 connectMongoDB(process.env.MONGO_URL)
   .then(() => console.log("MongoDB Connected"))
   .catch((err) => console.log(err));
