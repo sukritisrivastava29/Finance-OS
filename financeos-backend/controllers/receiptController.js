@@ -1,6 +1,4 @@
 const Tesseract = require("tesseract.js");
-const fs = require("fs");
-
 const Transaction = require("../models/Transaction");
 
 const scanReceipt = async (req, res) => {
@@ -11,7 +9,6 @@ const scanReceipt = async (req, res) => {
       });
     }
 
-    // OCR
     const result = await Tesseract.recognize(
       req.file.path,
       "eng"
@@ -19,130 +16,140 @@ const scanReceipt = async (req, res) => {
 
     const text = result.data.text;
 
-    // -------------------------
-    // Merchant
-    // -------------------------
-    const merchant =
-      text
-        .split("\n")
-        .find((line) => line.trim() !== "")
-        ?.trim() || "Receipt";
+  
+    const lines = text
+      .split("\n")
+      .map((line) => line.trim())
+      .filter((line) => line.length > 0);
 
-    // -------------------------
-    // Amount
-    // -------------------------
-    const amountMatch =
-      text.match(
-        /TOTAL[\s:]*?(?:INR|₹)?\s*([\d,.]+)/i
-      ) ||
-      text.match(
-        /AMOUNT[\s:]*?(?:INR|₹)?\s*([\d,.]+)/i
+  
+    const merchantKeywords = [
+      "STARBUCKS",
+      "DOMINOS",
+      "MCDONALDS",
+      "KFC",
+      "BURGER KING",
+      "SUBWAY",
+      "PIZZA HUT",
+      "ZOMATO",
+      "SWIGGY",
+      "AMAZON",
+      "FLIPKART",
+      "DMART",
+      "BIG BAZAAR",
+      "RELIANCE",
+      "APOLLO",
+      "MEDPLUS",
+      "INDIAN OIL",
+      "HP",
+      "BPCL"
+    ];
+
+    let title = "Receipt Expense";
+
+    for (const line of lines) {
+      const upper = line.toUpperCase();
+
+      const merchant = merchantKeywords.find((m) =>
+        upper.includes(m)
       );
 
-    const amount = amountMatch
-      ? Number(
-          amountMatch[1].replace(/,/g, "")
-        )
-      : 0;
+      if (merchant) {
+        title = merchant;
+        break;
+      }
+    }
+    let amount = 0;
 
-    // -------------------------
-    // Category Detection
-    // -------------------------
-    let category = "Others";
+    const totalLine = lines.find((line) =>
+      /total/i.test(line)
+    );
 
-    const lower = text.toLowerCase();
+    if (totalLine) {
+      const match = totalLine.match(
+        /(\d+[.,]?\d*)/
+      );
+
+      if (match) {
+        amount = parseFloat(
+          match[1].replace(",", "")
+        );
+      }
+    }
+
+    if (!amount) {
+      const amounts = text.match(/\d+\.\d{2}/g);
+
+      if (amounts && amounts.length) {
+        amount = parseFloat(
+          amounts[amounts.length - 1]
+        );
+      }
+    }
+
+    const upperText = text.toUpperCase();
+
+    let category = "Other";
 
     if (
-      lower.includes("coffee") ||
-      lower.includes("cafe") ||
-      lower.includes("latte") ||
-      lower.includes("starbucks") ||
-      lower.includes("restaurant") ||
-      lower.includes("pizza") ||
-      lower.includes("burger")
+      upperText.includes("LATTE") ||
+      upperText.includes("COFFEE") ||
+      upperText.includes("BURGER") ||
+      upperText.includes("PIZZA") ||
+      upperText.includes("CAFE") ||
+      upperText.includes("MUFFIN") ||
+      upperText.includes("FOOD")
     ) {
       category = "Food";
     }
 
     else if (
-      lower.includes("uber") ||
-      lower.includes("ola") ||
-      lower.includes("metro")
-    ) {
-      category = "Transport";
-    }
-
-    else if (
-      lower.includes("petrol") ||
-      lower.includes("diesel") ||
-      lower.includes("indian oil") ||
-      lower.includes("hp")
+      upperText.includes("PETROL") ||
+      upperText.includes("DIESEL") ||
+      upperText.includes("FUEL")
     ) {
       category = "Fuel";
     }
 
     else if (
-      lower.includes("amazon") ||
-      lower.includes("flipkart") ||
-      lower.includes("myntra")
-    ) {
-      category = "Shopping";
-    }
-
-    else if (
-      lower.includes("medical") ||
-      lower.includes("apollo") ||
-      lower.includes("pharmacy")
+      upperText.includes("MEDICINE") ||
+      upperText.includes("PHARMACY") ||
+      upperText.includes("APOLLO")
     ) {
       category = "Healthcare";
     }
 
     else if (
-      lower.includes("grocery") ||
-      lower.includes("dmart") ||
-      lower.includes("reliance fresh")
+      upperText.includes("AMAZON") ||
+      upperText.includes("FLIPKART")
     ) {
-      category = "Groceries";
+      category = "Shopping";
     }
 
-    // -------------------------
-    // Save Transaction
-    // -------------------------
-    const transaction =
-      await Transaction.create({
-        user: req.user.id,
-        title: merchant,
-        amount,
-        category,
-        type: "expense",
-        date: new Date(),
-      });
-
-    // -------------------------
-    // Delete uploaded file
-    // -------------------------
-    if (fs.existsSync(req.file.path)) {
-      fs.unlinkSync(req.file.path);
-    }
-
-    // -------------------------
-    // Response
-    // -------------------------
-    res.json({
-      success: true,
-      transaction,
-      merchant,
+    const transaction = await Transaction.create({
+      user: req.user.id,
+      title,
       amount,
       category,
       type: "expense",
-      text,
+      date: new Date(),
     });
+
+   res.json({
+  success: true,
+  text,
+  amount,
+  category,
+  title,
+  transaction,
+});
 
   } catch (error) {
     console.log(error);
 
     res.status(500).json({
       message: "OCR failed",
+      error: error.message,
     });
   }
 };

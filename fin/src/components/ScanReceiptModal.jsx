@@ -54,8 +54,8 @@ const scanReceipt = async () => {
     setOcrText(data.text);
 
     toast.success(
-      `₹${data.amount} added successfully!`
-    );
+  `${data.title} • ₹${data.amount} added successfully!`
+);
 
     refreshTransactions();
 
@@ -137,24 +137,17 @@ const scanReceipt = async () => {
           {loading ? "Scanning Receipt..." : "Scan Receipt"}
         </button>
 
-        {ocrText && (
+       {ocrText && (
   <div className="bg-slate-800 rounded-xl p-4 mb-4">
-
     <h3 className="text-lg font-semibold text-white mb-3">
       Extracted Information
     </h3>
 
     <div className="space-y-2 text-slate-300">
-
-      <p>
-        <span className="font-semibold">
-          Merchant:
-        </span>{" "}
-        {ocrText.split("\n")[0]}
-      </p>
-
+      <p><strong>Merchant:</strong> {merchant}</p>
+      <p><strong>Amount:</strong> ₹{amount}</p>
+      <p><strong>Category:</strong> {category}</p>
     </div>
-
   </div>
 )}
       </div>
