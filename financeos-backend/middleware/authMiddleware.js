@@ -21,7 +21,7 @@ console.log("Decoded:", decoded);
 
 req.user = decoded;
 
-    req.user = decoded;
+    
 
     next();
   } catch (error) {

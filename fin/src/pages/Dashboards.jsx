@@ -4,10 +4,12 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import Sidebar from "../components/Sidebar";
 import { FileDown } from "lucide-react";
+import AIChatModal from "../components/AIChatModal";
 import AddTransactionModal from "../components/AddTransactionModal";
 import { API_URL } from "../config";
 import { useNavigate } from "react-router-dom";
 import { generatePDF } from "../utils/generatePDF";
+import FloatingAIButton from "../components/FloatingAIButton";
 import {
   TrendingUp,
   TrendingDown,
@@ -41,6 +43,7 @@ function Dashboards() {
 });
   const [showModal, setShowModal] = useState(false);
 const [showScanner, setShowScanner] = useState(false);
+const [showAIChat, setShowAIChat] = useState(false);
   const fetchAnalytics = async () => {
     try {
       const { data } = await axios.get(
@@ -340,6 +343,14 @@ useEffect(() => {
     }}
 />
 )}
+{showAIChat && (
+  <AIChatModal
+    onClose={() => setShowAIChat(false)}
+  />
+)}
+<FloatingAIButton
+  onClick={() => setShowAIChat(true)}
+/>
     </div>
   );
 }
