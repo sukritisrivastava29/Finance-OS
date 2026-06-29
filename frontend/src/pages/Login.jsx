@@ -1,43 +1,39 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import axios from "axios";
 import { API_URL } from "../config";
 import toast from "react-hot-toast";
+
 function Login() {
   const navigate = useNavigate();
+
+  const passwordRef = useRef(null);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const handleLogin = async () => {
-  try {
-    const { data } = await axios.post(
-      `${API_URL}/auth/login`,
-      {
+    try {
+      const { data } = await axios.post(`${API_URL}/auth/login`, {
         email,
         password,
-      }
-    );
+      });
 
-    localStorage.setItem("token", data.token);
-    localStorage.setItem(
-      "user",
-      JSON.stringify(data.user)
-    );
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
 
-    toast.success("Welcome back!");
+      toast.success("Welcome back!");
 
-    navigate("/dashboard");
+      navigate("/dashboard");
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message || "Invalid email or password"
+      );
 
-  } catch (error) {
-    toast.error(
-      error.response?.data?.message ||
-      "Invalid email or password"
-    );
+      console.log(error.response?.data);
+    }
+  };
 
-    console.log(error.response?.data);
-  }
-};
   return (
     <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center px-6">
       <div className="bg-slate-900 p-8 rounded-xl w-full max-w-md">
@@ -50,38 +46,41 @@ function Login() {
         </p>
 
         <form
-  className="space-y-4"
-  onSubmit={(e) => {
-    e.preventDefault();
-    handleLogin();
-  }}
->
+          className="space-y-4"
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleLogin();
+          }}
+        >
           <input
             type="email"
             placeholder="Email Address"
             value={email}
-            onChange={(e) =>
-              setEmail(e.target.value)
-            }
+            onChange={(e) => setEmail(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                passwordRef.current?.focus();
+              }
+            }}
             className="w-full p-3 rounded-lg bg-slate-800 border border-slate-700 outline-none"
           />
 
           <input
+            ref={passwordRef}
             type="password"
             placeholder="Password"
             value={password}
-            onChange={(e) =>
-              setPassword(e.target.value)
-            }
+            onChange={(e) => setPassword(e.target.value)}
             className="w-full p-3 rounded-lg bg-slate-800 border border-slate-700 outline-none"
           />
 
           <button
-  type="submit"
-  className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 py-3 rounded-xl hover:scale-[1.02] transition-all duration-200 font-semibold shadow-lg"
->
-  Login
-</button>
+            type="submit"
+            className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 py-3 rounded-xl hover:scale-[1.02] transition-all duration-200 font-semibold shadow-lg"
+          >
+            Login
+          </button>
 
           <p className="text-slate-400 text-center">
             Don't have an account?{" "}
@@ -92,9 +91,9 @@ function Login() {
               Sign Up
             </Link>
           </p>
-          </form>
-        </div>
+        </form>
       </div>
+    </div>
   );
 }
 

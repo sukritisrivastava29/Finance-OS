@@ -35,7 +35,7 @@
             <h4 className="font-semibold mb-3">Developer</h4>
             <div className="flex flex-col gap-2 text-slate-400">
               <a
-                href="https://github.com/yourusername"
+                href="https://github.com/sukritisrivastava29"
                 target="_blank"
                 rel="noreferrer"
                 className="hover:text-white transition"
@@ -44,7 +44,7 @@
               </a>
 
               <a
-                href="https://linkedin.com/in/yourprofile"
+                href="https://www.linkedin.com/in/sukritisrivastava29/"
                 target="_blank"
                 rel="noreferrer"
                 className="hover:text-white transition"
@@ -53,7 +53,7 @@
               </a>
 
               <a
-                href="mailto:youremail@example.com"
+                href="mailto:sukriti.srivastava2903@gmail.com"
                 className="hover:text-white transition"
               >
                 Email
