@@ -3,7 +3,7 @@ import MonthlyChart from "../components/MonthlyChart";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Sidebar from "../components/Sidebar";
-import { FileDown } from "lucide-react";
+
 import AIChatModal from "../components/AIChatModal";
 import AddTransactionModal from "../components/AddTransactionModal";
 import { API_URL } from "../config";
@@ -14,7 +14,6 @@ import {
   TrendingUp,
   TrendingDown,
   Wallet,
-  Search,
   Plus,
   Pencil,
   Trash2,
@@ -132,8 +131,8 @@ useEffect(() => {
     <div className="min-h-screen bg-slate-950 text-white flex">
       <Sidebar />
 
-      <div className="flex-1 p-10">
-<div className="flex justify-between items-center mb-8">
+     <div className="flex-1 p-4 md:p-10 pt-20 md:pt-10 overflow-x-hidden">
+<div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-5 mb-8">
   <div>
     <h1 className="text-3xl font-bold">
       Dashboard
@@ -144,7 +143,7 @@ useEffect(() => {
     </p>
   </div>
 
-  <div className="flex gap-3">
+<div className="flex flex-wrap gap-3 w-full lg:w-auto">
 
   <button
     onClick={() =>
@@ -154,7 +153,7 @@ useEffect(() => {
         user
       )
     }
-    className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 px-5 py-3 rounded-xl shadow-lg hover:scale-105 transition-all"
+    className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 flex-1 sm:flex-none px-4 py-3 rounded-xl shadow-lg hover:scale-105 transition-all"
   >
     📄 Export PDF
   </button>
@@ -163,7 +162,7 @@ useEffect(() => {
     onClick={() =>
       setShowScanner(true)
     }
-    className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 px-5 py-3 rounded-xl shadow-lg hover:scale-105 transition-all"
+    className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 flex-1 sm:flex-none px-4 py-3 rounded-xl shadow-lg hover:scale-105 transition-all"
   >
     <Camera size={18} />
     Scan Receipt
@@ -174,7 +173,7 @@ useEffect(() => {
       setEditingTransaction(null);
       setShowModal(true);
     }}
-    className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 px-5 py-3 rounded-xl shadow-lg hover:scale-105 transition-all"
+    className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 flex-1 sm:flex-none px-4 py-3 rounded-xl shadow-lg hover:scale-105 transition-all"
   >
     <Plus size={18} />
     Add Transaction
@@ -183,7 +182,7 @@ useEffect(() => {
 </div>
 </div>
         {/* Stats Cards */}
-        <div className="grid md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="bg-slate-900 rounded-2xl p-6 shadow-lg hover:shadow-green-500/20 hover:-translate-y-1 transition-all duration-300">
           <div className="flex items-center gap-4">
             <div className="bg-green-500/20 p-4 rounded-xl">
@@ -249,7 +248,7 @@ useEffect(() => {
         </div>
 
         {/* Recent Transactions */}
-        <div className="bg-slate-900 rounded-xl p-6 mb-8">
+        <div className="bg-slate-900 rounded-xl p-4 md:p-6 mb-8 overflow-hidden">
           <h2 className="text-2xl font-bold mb-4">
             Recent Transactions
           </h2>
@@ -263,7 +262,7 @@ useEffect(() => {
     transactions.map((transaction) => (
      <div
   key={transaction._id}
-  className="flex justify-between items-center bg-slate-800 p-4 rounded-lg"
+  className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 bg-slate-800 p-4 rounded-lg"
 >
   <div>
     <p>{transaction.title}</p>
@@ -298,7 +297,11 @@ useEffect(() => {
   <Pencil size={18} />
 </button>
     <button
-      onClick={() => deleteTransaction(transaction._id)}
+      onClick={() => {
+  if (window.confirm("Delete this transaction?")) {
+    deleteTransaction(transaction._id);
+  }
+}}
       className="text-red-500 hover:text-red-700"
     >
      <Trash2 size={18} />
@@ -309,7 +312,7 @@ useEffect(() => {
   )}
 </div>
         </div>
-        <div className="grid md:grid-cols-2 gap-6 mb-10">
+       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-10">
   <ExpensePieChart
     data={analytics.expenseByCategory}
   />

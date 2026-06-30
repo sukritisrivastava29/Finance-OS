@@ -263,75 +263,93 @@ if (loading) {
   />
 </div>
 
-        {/* Transactions Table */}
-        <div className="bg-slate-900 rounded-xl p-6">
-        <div className="grid grid-cols-5 font-semibold border-b border-slate-700 pb-4 mb-4">
-  <p>📝 Description</p>
-  <p>🏷️ Category</p>
-  <p>💵 Amount</p>
-  <p>📅 Date</p>
-  <p>⚙️ Actions</p>
-</div>
+      {/* Transactions Table */}
+<div className="bg-slate-900 rounded-xl p-4 md:p-6 overflow-hidden">
+  <div className="overflow-x-auto">
+    <div className="min-w-[750px]">
 
-         {transactions.length === 0 ? (
-  <p className="text-center text-slate-400 py-6">
-    No transactions found.
-  </p>
-) : (
-  transactions.map((transaction) => (
-    <div
-      key={transaction._id}
-     className="grid grid-cols-5 py-4 border-b border-slate-800 items-center hover:bg-slate-800 rounded-lg transition-all duration-200"
-    >
-      <p>{transaction.title}</p>
-
-   <span className="inline-flex items-center gap-2 bg-slate-800 px-3 py-1 rounded-full text-sm">
-  {getCategoryEmoji(transaction.category)}
-  {transaction.category}
-</span>
-<p
-  className={`font-semibold flex items-center gap-2 ${
-    transaction.type === "income"
-      ? "text-green-400"
-      : "text-red-400"
-  }`}
->
-  {transaction.type === "income" ? "📈" : "📉"}
-
-  {transaction.type === "income" ? "+" : "-"}₹
-  {transaction.amount}
-</p>
-
-      <p>
-        {new Date(transaction.date).toLocaleDateString()}
-      </p>
-
-      <div className="flex gap-4">
-        <button
-          onClick={() => {
-            setEditingTransaction(transaction);
-            setShowModal(true);
-          }}
-          className="text-blue-400 hover:text-blue-600"
-        >
-          <Pencil size={18} />
-        </button>
-
-        <button
-          onClick={() => {
-  if (window.confirm("Delete this transaction?")) {
-    deleteTransaction(transaction._id);
-  }
-}}
-          className="text-red-500 hover:text-red-700"
-        >
-         <Trash2 size={18} />
-        </button>
+      {/* Header */}
+      <div className="grid grid-cols-5 font-semibold border-b border-slate-700 pb-4 mb-4">
+        <p>📝 Description</p>
+        <p>🏷️ Category</p>
+        <p>💵 Amount</p>
+        <p>📅 Date</p>
+        <p>⚙️ Actions</p>
       </div>
+
+      {transactions.length === 0 ? (
+        <p className="text-center text-slate-400 py-6">
+          No transactions found.
+        </p>
+      ) : (
+        transactions.map((transaction) => (
+          <div
+            key={transaction._id}
+            className="grid grid-cols-5 py-4 border-b border-slate-800 items-center hover:bg-slate-800 rounded-lg transition-all duration-200"
+          >
+            {/* Description */}
+            <p className="truncate">
+              {transaction.title}
+            </p>
+
+            {/* Category */}
+            <span className="inline-flex items-center gap-2 bg-slate-800 px-3 py-1 rounded-full text-sm w-fit">
+              {getCategoryEmoji(transaction.category)}
+              {transaction.category}
+            </span>
+
+            {/* Amount */}
+            <p
+              className={`font-semibold flex items-center gap-2 ${
+                transaction.type === "income"
+                  ? "text-green-400"
+                  : "text-red-400"
+              }`}
+            >
+              {transaction.type === "income" ? "📈" : "📉"}
+              {transaction.type === "income" ? "+" : "-"}₹
+              {transaction.amount}
+            </p>
+
+            {/* Date */}
+            <p>
+              {new Date(transaction.date).toLocaleDateString()}
+            </p>
+
+            {/* Actions */}
+            <div className="flex gap-4">
+              <button
+                onClick={() => {
+                  setEditingTransaction(transaction);
+                  setShowModal(true);
+                }}
+                className="text-blue-400 hover:text-blue-600"
+              >
+                <Pencil size={18} />
+              </button>
+
+              <button
+                onClick={() => {
+                  if (
+                    window.confirm(
+                      "Delete this transaction?"
+                    )
+                  ) {
+                    deleteTransaction(transaction._id);
+                  }
+                }}
+                className="text-red-500 hover:text-red-700"
+              >
+                <Trash2 size={18} />
+              </button>
+            </div>
+          </div>
+        ))
+      )}
+
     </div>
-  ))
-)}
-        </div>
+  </div>
+</div>
       </div>
       {showModal && (
   <AddTransactionModal

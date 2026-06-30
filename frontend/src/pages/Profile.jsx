@@ -66,11 +66,8 @@ function Profile() {
                 Active
               </p>
             </div>
-
+</div>
           </div>
-
-        </div>
-
       </div>
     </div>
   );
