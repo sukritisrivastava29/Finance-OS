@@ -2,7 +2,7 @@ import Navbar from "../components/Navbar";
 import Hero from "../components/Hero";
 import Features from "../components/Features";
 import DashPreview from "../components/DashPreview";
-import work from "../components/work";
+import Work from "../components/Work";
 import Footer from "../components/Footer";
 
 function LandingPage() {
