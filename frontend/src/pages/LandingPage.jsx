@@ -2,7 +2,7 @@ import Navbar from "../components/Navbar";
 import Hero from "../components/Hero";
 import Features from "../components/Features";
 import DashPreview from "../components/DashPreview";
-import Work from "../components/Work";
+import work from "../components/work";
 import Footer from "../components/Footer";
 
 function LandingPage() {
@@ -11,7 +11,7 @@ function LandingPage() {
       <Navbar />
       <Hero />
       <Features />
-      <Work/>
+      <work/>
       <DashPreview/>
       <Footer/>
     </div>
