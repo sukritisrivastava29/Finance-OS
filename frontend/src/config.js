@@ -1,2 +1,2 @@
 export const API_URL =
-  "http://localhost:5000/api";
+  "https://finance-os-i2uo.onrender.com/";

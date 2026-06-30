@@ -9,7 +9,7 @@ function Profile() {
     <div className="min-h-screen bg-slate-950 text-white flex">
       <Sidebar />
 
-      <div className="flex-1 p-10">
+      <div className="flex-1 p-4 md:p-10 pt-20 md:pt-10">
 
         <h1 className="text-3xl font-bold mb-8">
           Profile
