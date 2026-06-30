@@ -1,6 +1,6 @@
 import Navbar from "../components/Navbar";
 import Hero from "../components/Hero";
-import Features from "../components/Features";
+import features from "../components/features";
 import DashPreview from "../components/DashPreview";
 import work from "../components/work";
 import Footer from "../components/Footer";
@@ -10,7 +10,7 @@ function LandingPage() {
     <div className="min-h-screen bg-slate-950 text-white">
       <Navbar />
       <Hero />
-      <Features />
+      <features />
       <work/>
       <DashPreview/>
       <Footer/>
