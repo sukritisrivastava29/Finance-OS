@@ -22,6 +22,7 @@ function Sidebar() {
 
   return (
     <>
+      {/* Mobile Header */}
       <div className="md:hidden fixed top-0 left-0 right-0 h-16 surface border-b flex items-center justify-between px-5 z-50">
         <h1 className="text-xl font-bold">FinanceOS</h1>
 
@@ -38,9 +39,26 @@ function Sidebar() {
       )}
 
       <div
-        className={`fixed md:static top-0 left-0 h-screen w-64 surface border-r p-6 flex flex-col z-50 transform transition-transform duration-300 ${
-          open ? "translate-x-0" : "-translate-x-full md:translate-x-0"
-        }`}
+        className={`
+          fixed md:static
+          top-0 left-0
+          h-screen
+          w-64
+          surface
+          border-r
+          p-6
+          flex
+          flex-col
+          z-50
+          transform
+          transition-transform
+          duration-300
+          ${
+            open
+              ? "translate-x-0"
+              : "-translate-x-full md:translate-x-0"
+          }
+        `}
       >
         <div className="flex justify-between items-center mb-10">
           <h1 className="text-2xl font-bold">FinanceOS</h1>

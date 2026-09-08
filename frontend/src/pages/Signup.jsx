@@ -53,7 +53,6 @@ function Signup() {
       toast.error(
         error.response?.data?.message || "Registration failed"
       );
-
       console.error(error);
     } finally {
       setLoading(false);
@@ -126,9 +125,7 @@ function Signup() {
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2
-                         text-[var(--text-muted)] hover:text-[var(--primary)]
-                         transition-colors"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--primary)] transition-colors"
               aria-label={
                 showPassword ? "Hide password" : "Show password"
               }
@@ -156,9 +153,7 @@ function Signup() {
               onClick={() =>
                 setShowConfirmPassword(!showConfirmPassword)
               }
-              className="absolute right-3 top-1/2 -translate-y-1/2
-                         text-[var(--text-muted)] hover:text-[var(--primary)]
-                         transition-colors"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--primary)] transition-colors"
               aria-label={
                 showConfirmPassword
                   ? "Hide confirm password"
