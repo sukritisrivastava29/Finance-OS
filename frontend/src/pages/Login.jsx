@@ -11,37 +11,81 @@ function Login() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
+    if (!email.trim() || !password.trim()) {
+      toast.error("Please enter your email and password.");
+      return;
+    }
+
     try {
-      const { data } = await axios.post(`${API_URL}/auth/login`, {
-        email,
-        password,
-      });
+      setLoading(true);
+
+      const { data } = await axios.post(
+        `${API_URL}/auth/login`,
+        {
+          email,
+          password,
+        }
+      );
 
       localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
+      localStorage.setItem(
+        "user",
+        JSON.stringify(data.user)
+      );
 
       toast.success("Welcome back!");
 
       navigate("/dashboard");
     } catch (error) {
-      toast.error(
-        error.response?.data?.message || "Invalid email or password"
-      );
+  const status = error.response?.status;
+  const message = error.response?.data?.message;
 
-      console.log(error.response?.data);
+  if (status === 404) {
+    toast.error(
+      (t) => (
+        <div className="flex items-center gap-3">
+          <span>
+            User doesn't exist. Please create an account.
+          </span>
+
+          <button
+            onClick={() => {
+              toast.dismiss(t.id);
+              navigate("/signup");
+            }}
+            className="font-semibold text-[var(--primary)] hover:underline whitespace-nowrap"
+          >
+            Create Account
+          </button>
+        </div>
+      ),
+      {
+        duration: 5000,
+      }
+    );
+  } else {
+    toast.error(
+      message || "Invalid email or password"
+    );
+  }
+
+  console.error(error);
+} finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center px-6">
-      <div className="bg-slate-900 p-8 rounded-xl w-full max-w-md">
+    <div className="app-theme min-h-screen flex items-center justify-center px-6">
+      <div className="card-theme w-full max-w-md rounded-2xl p-8 shadow-2xl">
         <h1 className="text-3xl font-bold mb-2">
           Welcome Back
         </h1>
 
-        <p className="text-slate-400 mb-6">
+        <p className="text-muted mb-6">
           Login to your FinanceOS account.
         </p>
 
@@ -63,7 +107,7 @@ function Login() {
                 passwordRef.current?.focus();
               }
             }}
-            className="w-full p-3 rounded-lg bg-slate-800 border border-slate-700 outline-none"
+            className="input-theme"
           />
 
           <input
@@ -71,22 +115,29 @@ function Login() {
             type="password"
             placeholder="Password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full p-3 rounded-lg bg-slate-800 border border-slate-700 outline-none"
+            onChange={(e) =>
+              setPassword(e.target.value)
+            }
+            className="input-theme"
           />
 
           <button
             type="submit"
-            className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 py-3 rounded-xl hover:scale-[1.02] transition-all duration-200 font-semibold shadow-lg"
+            disabled={loading}
+            className={`w-full ${
+              loading
+                ? "secondary-btn cursor-not-allowed"
+                : "primary-btn"
+            } py-3 rounded-xl font-semibold transition`}
           >
-            Login
+            {loading ? "Logging in..." : "Login"}
           </button>
 
-          <p className="text-slate-400 text-center">
+          <p className="text-muted text-center">
             Don't have an account?{" "}
             <Link
               to="/signup"
-              className="text-blue-400 hover:text-blue-300"
+              className="text-[var(--primary)] hover:opacity-80 transition"
             >
               Sign Up
             </Link>

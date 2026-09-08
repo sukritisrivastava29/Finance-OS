@@ -2,27 +2,32 @@ import { Bot, User, Copy, Check } from "lucide-react";
 import { useState } from "react";
 import ReactMarkdown from "react-markdown";
 
+
 function ChatMessage({ message }) {
   const isUser = message.sender === "user";
 
   const [copied, setCopied] = useState(false);
 
-  const time = new Date().toLocaleTimeString([], {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+  const time = message.createdAt
+    ? new Date(message.createdAt).toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+    : new Date().toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
 
   const copyMessage = async () => {
     try {
       await navigator.clipboard.writeText(message.text);
-
       setCopied(true);
 
       setTimeout(() => {
         setCopied(false);
       }, 2000);
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
   };
 
@@ -33,13 +38,11 @@ function ChatMessage({ message }) {
       }`}
     >
       <div
-        className={`flex gap-3 5
-          max-w-[78%] ${
+        className={`flex gap-3 max-w-[78%] ${
           isUser ? "flex-row-reverse" : ""
         }`}
       >
         {/* Avatar */}
-
         <div
           className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 shadow-lg ${
             isUser
@@ -47,21 +50,15 @@ function ChatMessage({ message }) {
               : "bg-gradient-to-br from-violet-600 via-blue-600 to-cyan-500"
           }`}
         >
-          {isUser ? (
-            <User size={18} />
-          ) : (
-            <Bot size={18} />
-          )}
+          {isUser ? <User size={18} /> : <Bot size={18} />}
         </div>
 
-        {/* Bubble */}
-
+        {/* Message Bubble */}
         <div
-          className={`rounded-3xl px-5 py-4 relative backdrop-blur-xl transition-all duration-300 hover:scale-[1.01]
-          ${
+          className={`rounded-3xl px-5 py-4 relative transition-all duration-300 hover:scale-[1.01] ${
             isUser
               ? "bg-gradient-to-r from-blue-600 to-cyan-500 text-white"
-              : "bg-slate-800/90 border border-slate-700 text-slate-100"
+              : "card-theme"
           }`}
         >
           {!isUser && (
@@ -76,11 +73,14 @@ function ChatMessage({ message }) {
 
               <button
                 onClick={copyMessage}
-                className="hover:bg-slate-700 p-2 rounded-lg transition"
-                title="Copy"
+                className="icon-btn p-2"
+                title="Copy response"
               >
                 {copied ? (
-                  <Check size={16} className="text-green-400" />
+                  <Check
+                    size={16}
+                    className="text-green-400"
+                  />
                 ) : (
                   <Copy size={16} />
                 )}
@@ -95,23 +95,24 @@ function ChatMessage({ message }) {
           )}
 
           <div
-            className="prose prose-invert prose-sm max-w-none
+            className={`prose max-w-none break-words
             prose-p:my-2
             prose-ul:my-2
             prose-li:my-1
-            prose-strong:text-white
-            break-words"
+            ${
+              isUser
+                ? "prose-invert prose-strong:text-white"
+                : ""
+            }`}
           >
-            <ReactMarkdown>
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>
               {message.text}
             </ReactMarkdown>
           </div>
 
           <div
             className={`text-[11px] mt-4 ${
-              isUser
-                ? "text-blue-100"
-                : "text-slate-400"
+              isUser ? "text-blue-100" : "text-muted"
             }`}
           >
             {time}

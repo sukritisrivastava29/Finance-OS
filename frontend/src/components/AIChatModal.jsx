@@ -171,7 +171,6 @@ Ask me anything about your finances!`,
 
   return (
    <div className="fixed top-6 bottom-6 right-6 z-50 w-[470px] max-w-[95vw] rounded-3xl overflow-hidden border border-slate-700/70 bg-slate-900/90 backdrop-blur-2xl shadow-[0_20px_60px_rgba(0,0,0,0.45)] flex flex-col">
-      {/* Header */}
 
       <div className="sticky top-0 z-50 bg-gradient-to-r from-indigo-600 via-blue-600 to-cyan-500 px-6 py-5 flex items-center justify-between">
 

@@ -13,9 +13,17 @@ function Signup() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSignup = async () => {
+    if (!name.trim() || !email.trim() || !password.trim()) {
+      toast.error("Please fill all fields.");
+      return;
+    }
+
     try {
+      setLoading(true);
+
       await axios.post(`${API_URL}/auth/register`, {
         name,
         email,
@@ -27,21 +35,24 @@ function Signup() {
       navigate("/login");
     } catch (error) {
       toast.error(
-        error.response?.data?.message || "Registration failed"
+        error.response?.data?.message ||
+          "Registration failed"
       );
 
-      console.log(error.response?.data);
+      console.error(error);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center px-6">
-      <div className="bg-slate-900 p-8 rounded-xl w-full max-w-md">
+    <div className="app-theme min-h-screen flex items-center justify-center px-6">
+      <div className="card-theme w-full max-w-md rounded-2xl p-8 shadow-2xl">
         <h1 className="text-3xl font-bold mb-2">
           Create Account
         </h1>
 
-        <p className="text-slate-400 mb-6">
+        <p className="text-muted mb-6">
           Start managing your finances today.
         </p>
 
@@ -56,14 +67,16 @@ function Signup() {
             type="text"
             placeholder="Full Name"
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            onChange={(e) =>
+              setName(e.target.value)
+            }
             onKeyDown={(e) => {
               if (e.key === "Enter") {
                 e.preventDefault();
                 emailRef.current?.focus();
               }
             }}
-            className="w-full p-3 rounded-lg bg-slate-800 outline-none border border-slate-700"
+            className="input-theme"
           />
 
           <input
@@ -71,14 +84,16 @@ function Signup() {
             type="email"
             placeholder="Email Address"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) =>
+              setEmail(e.target.value)
+            }
             onKeyDown={(e) => {
               if (e.key === "Enter") {
                 e.preventDefault();
                 passwordRef.current?.focus();
               }
             }}
-            className="w-full p-3 rounded-lg bg-slate-800 outline-none border border-slate-700"
+            className="input-theme"
           />
 
           <input
@@ -86,22 +101,31 @@ function Signup() {
             type="password"
             placeholder="Password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full p-3 rounded-lg bg-slate-800 outline-none border border-slate-700"
+            onChange={(e) =>
+              setPassword(e.target.value)
+            }
+            className="input-theme"
           />
 
           <button
             type="submit"
-            className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 py-3 rounded-xl hover:scale-[1.02] transition-all duration-200 font-semibold shadow-lg"
+            disabled={loading}
+            className={`w-full py-3 rounded-xl font-semibold transition ${
+              loading
+                ? "secondary-btn cursor-not-allowed"
+                : "primary-btn"
+            }`}
           >
-            Sign Up
+            {loading
+              ? "Creating Account..."
+              : "Sign Up"}
           </button>
 
-          <p className="text-slate-400 text-center">
+          <p className="text-muted text-center">
             Already have an account?{" "}
             <Link
               to="/login"
-              className="text-blue-400 hover:text-blue-300"
+              className="text-[var(--primary)] hover:opacity-80 transition"
             >
               Login
             </Link>

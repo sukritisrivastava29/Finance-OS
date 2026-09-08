@@ -30,7 +30,7 @@ function Insights() {
 
       setAnalytics(data);
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   };
 
@@ -47,14 +47,14 @@ function Insights() {
 
       setSummary(data);
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   };
 
   useEffect(() => {
     fetchAnalytics();
     fetchSummary();
-  }, []);
+  }, [token]);
 
   const savingsRate =
     summary.income > 0
@@ -88,130 +88,121 @@ function Insights() {
       : null;
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white flex">
+    <div className="app-theme flex min-h-screen">
       <Sidebar />
-<div className="flex-1 p-4 md:p-10 pt-20 md:pt-10">
+
+      <div className="flex-1 p-4 md:p-10 pt-20 md:pt-10">
         <h1 className="text-3xl font-bold mb-8">
           Insights
         </h1>
 
-        {/* Top Cards */}
+        {/* Summary Cards */}
         <div className="grid md:grid-cols-4 gap-6 mb-8">
-
-          <div className="bg-slate-900 rounded-xl p-6">
-            <p className="text-slate-400">
+          <div className="card-theme rounded-xl p-6">
+            <p className="text-muted">
               Income
             </p>
 
-            <h2 className="text-3xl font-bold mt-2">
-              ₹{summary.income}
+            <h2 className="text-3xl font-bold mt-2 text-green-500">
+              ₹{summary.income.toLocaleString("en-IN")}
             </h2>
           </div>
 
-          <div className="bg-slate-900 rounded-xl p-6">
-            <p className="text-slate-400">
+          <div className="card-theme rounded-xl p-6">
+            <p className="text-muted">
               Expenses
             </p>
 
-            <h2 className="text-3xl font-bold mt-2">
-              ₹{summary.expense}
+            <h2 className="text-3xl font-bold mt-2 text-red-500">
+              ₹{summary.expense.toLocaleString("en-IN")}
             </h2>
           </div>
 
-          <div className="bg-slate-900 rounded-xl p-6">
-            <p className="text-slate-400">
+          <div className="card-theme rounded-xl p-6">
+            <p className="text-muted">
               Savings Rate
             </p>
 
-            <h2 className="text-3xl font-bold mt-2">
+            <h2 className="text-3xl font-bold mt-2 text-blue-500">
               {savingsRate}%
             </h2>
           </div>
 
-          <div className="bg-slate-900 rounded-xl p-6">
-            <p className="text-slate-400">
+          <div className="card-theme rounded-xl p-6">
+            <p className="text-muted">
               Health Score
             </p>
 
-            <h2 className="text-3xl font-bold mt-2 text-green-400">
+            <h2 className="text-3xl font-bold mt-2 text-green-500">
               {healthScore}/100
             </h2>
           </div>
-
         </div>
 
         {/* Spending By Category */}
-        <div className="bg-slate-900 rounded-xl p-6">
+        <div className="card-theme rounded-xl p-6">
           <h2 className="text-2xl font-bold mb-4">
             Spending By Category
           </h2>
 
           <div className="space-y-4">
-            {analytics.expenseByCategory.length ===
-            0 ? (
-              <p className="text-slate-400">
-                No spending data available.
+            {analytics.expenseByCategory.length === 0 ? (
+              <p className="text-muted text-center py-8">
+                📊 No spending data available yet.
               </p>
             ) : (
-              analytics.expenseByCategory.map(
-                (item) => (
-                  <div
-                    key={item.category}
-                    className="flex justify-between"
-                  >
-                    <p>{item.category}</p>
+              analytics.expenseByCategory.map((item) => (
+                <div
+                  key={item.category}
+                  className="flex justify-between items-center"
+                >
+                  <p>{item.category}</p>
 
-                    <p>
-                      ₹{item.amount}
-                    </p>
-                  </div>
-                )
-              )
+                  <p className="font-semibold">
+                    ₹{item.amount.toLocaleString("en-IN")}
+                  </p>
+                </div>
+              ))
             )}
           </div>
         </div>
 
         {/* Smart Insights */}
-        <div className="bg-slate-900 rounded-xl p-6 mt-8">
+        <div className="card-theme rounded-xl p-6 mt-8">
           <h2 className="text-2xl font-bold mb-4">
             Smart Insights
           </h2>
 
           <div className="space-y-4">
-
             {summary.expense >
               summary.income * 0.8 && (
               <div className="border border-red-500 rounded-lg p-4">
-                ⚠️ Your expenses are more
-                than 80% of your income.
+                ⚠️ Your expenses are more than 80% of your income.
               </div>
             )}
 
             {summary.expense <
               summary.income * 0.5 &&
               summary.income > 0 && (
-                <div className="border border-green-500 rounded-lg p-4">
-                  🎉 Excellent savings
-                  habit! You saved more
-                  than 50% of your income.
-                </div>
-              )}
+              <div className="border border-green-500 rounded-lg p-4">
+                🎉 Excellent savings habit! You saved more than
+                50% of your income.
+              </div>
+            )}
 
             {summary.balance > 0 && (
               <div className="border border-blue-500 rounded-lg p-4">
-                💰 Current balance:
-                ₹{summary.balance}
+                💰 Current Balance: ₹
+                {summary.balance.toLocaleString("en-IN")}
               </div>
             )}
 
             {highestCategory && (
               <div className="border border-yellow-500 rounded-lg p-4">
-                📊 Highest spending
-                category:{" "}
-                {highestCategory.category}
+                📊 Highest spending category:{" "}
+                <strong>{highestCategory.category}</strong>
               </div>
             )}
-
           </div>
         </div>
       </div>

@@ -9,14 +9,11 @@ function AddTransactionModal({
   refreshTransactions,
 }) {
   const token = localStorage.getItem("token");
-
-  // Refs
   const titleRef = useRef(null);
   const amountRef = useRef(null);
   const categoryRef = useRef(null);
   const typeRef = useRef(null);
   const dateRef = useRef(null);
-
   const [loading, setLoading] = useState(false);
 
   const [title, setTitle] = useState(
@@ -40,8 +37,6 @@ function AddTransactionModal({
       ? transaction.date.substring(0, 10)
       : new Date().toISOString().split("T")[0]
   );
-
-  // Categories
 
   const expenseCategories = [
     "Food",
@@ -170,13 +165,13 @@ function AddTransactionModal({
 >
   <div
     onClick={(e) => e.stopPropagation()}
-    className="w-full max-w-md rounded-2xl bg-slate-900 border border-slate-700 shadow-2xl p-8"
+    className="modal-theme w-full max-w-md rounded-2xl shadow-2xl p-8"
   >
     <h2 className="text-2xl font-bold mb-2">
       {transaction ? "Edit Transaction" : "Add Transaction"}
     </h2>
 
-    <p className="text-slate-400 mb-6">
+    <p className="text-muted mb-6">
       {transaction
         ? "Update your transaction details."
         : "Record a new income or expense."}
@@ -189,11 +184,11 @@ function AddTransactionModal({
         handleSubmit();
       }}
     >
-      {/* Title */}
-
+     
       <input
         ref={titleRef}
         type="text"
+        autoComplete="off"
         placeholder="Transaction Title"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
@@ -203,10 +198,8 @@ function AddTransactionModal({
             amountRef.current?.focus();
           }
         }}
-        className="w-full rounded-xl bg-slate-800 border border-slate-700 px-4 py-3 outline-none focus:border-blue-500"
+        className="input-theme"
       />
-
-      {/* Amount */}
 
       <input
         ref={amountRef}
@@ -220,10 +213,8 @@ function AddTransactionModal({
             categoryRef.current?.focus();
           }
         }}
-        className="w-full rounded-xl bg-slate-800 border border-slate-700 px-4 py-3 outline-none focus:border-blue-500"
+        className="input-theme"
       />
-
-      {/* Category */}
 
       <select
         ref={categoryRef}
@@ -235,9 +226,8 @@ function AddTransactionModal({
             typeRef.current?.focus();
           }
         }}
-        className="w-full rounded-xl bg-slate-800 border border-slate-700 px-4 py-3 outline-none focus:border-blue-500"
-      >
-        <option value="">
+        className="input-theme">
+        <option value=""disabled>
           Select Category
         </option>
 
@@ -254,8 +244,7 @@ function AddTransactionModal({
         ))}
       </select>
 
-      {/* Type */}
-
+    
       <select
         ref={typeRef}
         value={type}
@@ -269,7 +258,7 @@ function AddTransactionModal({
             dateRef.current?.focus();
           }
         }}
-        className="w-full rounded-xl bg-slate-800 border border-slate-700 px-4 py-3 outline-none focus:border-blue-500"
+        className="input-theme"
       >
         <option value="expense">
           Expense
@@ -280,7 +269,7 @@ function AddTransactionModal({
         </option>
       </select>
 
-      {/* Date */}
+      
 
       <input
         ref={dateRef}
@@ -289,37 +278,38 @@ function AddTransactionModal({
         onChange={(e) =>
           setDate(e.target.value)
         }
-        className="w-full rounded-xl bg-slate-800 border border-slate-700 px-4 py-3 outline-none focus:border-blue-500"
+        className="input-theme"
       />
 
-      {/* Buttons */}
-
+      
       <div className="flex justify-end gap-3 pt-3">
 
         <button
-          type="button"
-          onClick={onClose}
-          disabled={loading}
-          className="px-5 py-2.5 rounded-xl bg-slate-700 hover:bg-slate-600 transition"
-        >
-          Cancel
-        </button>
+  type="button"
+  onClick={onClose}
+  disabled={loading}
+  className={`secondary-btn px-5 py-2.5 rounded-xl transition ${
+    loading ? "opacity-50 cursor-not-allowed" : ""
+  }`}
+>
+  Cancel
+</button>
 
         <button
-          type="submit"
-          disabled={loading}
-          className={`px-6 py-2.5 rounded-xl font-semibold transition-all duration-200 ${
-            loading
-              ? "bg-slate-700 cursor-not-allowed"
-              : "bg-gradient-to-r from-blue-600 to-indigo-600 hover:scale-105 shadow-lg"
-          }`}
-        >
-          {loading
-            ? "Saving..."
-            : transaction
-            ? "Update"
-            : "Save"}
-        </button>
+  type="submit"
+  disabled={loading}
+  className={`primary-btn px-6 py-2.5 rounded-xl font-semibold transition-all duration-200 ${
+    loading
+      ? "opacity-50 cursor-not-allowed"
+      : "hover:scale-105"
+  }`}
+>
+  {loading
+    ? "Saving..."
+    : transaction
+    ? "Update"
+    : "Save"}
+</button>
 
       </div>
     </form>

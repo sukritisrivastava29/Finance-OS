@@ -3,8 +3,6 @@ import MonthlyChart from "../components/MonthlyChart";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Sidebar from "../components/Sidebar";
-
-import AIChatModal from "../components/AIChatModal";
 import AddTransactionModal from "../components/AddTransactionModal";
 import { API_URL } from "../config";
 import { useNavigate } from "react-router-dom";
@@ -26,7 +24,6 @@ function Dashboards() {
   const [editingTransaction, setEditingTransaction] = useState(null);
   const [transactions, setTransactions] = useState([]);
   const token = localStorage.getItem("token");
-  console.log("Token:", token);
   const navigate=useNavigate();
   const user = JSON.parse(
     localStorage.getItem("user")
@@ -42,7 +39,7 @@ function Dashboards() {
 });
   const [showModal, setShowModal] = useState(false);
 const [showScanner, setShowScanner] = useState(false);
-const [showAIChat, setShowAIChat] = useState(false);
+
   const fetchAnalytics = async () => {
     try {
       const { data } = await axios.get(
@@ -346,14 +343,8 @@ useEffect(() => {
     }}
 />
 )}
-{showAIChat && (
-  <AIChatModal
-    onClose={() => setShowAIChat(false)}
-  />
-)}
-<FloatingAIButton
-  onClick={() => setShowAIChat(true)}
-/>
+
+<FloatingAIButton/>
     </div>
   );
 }

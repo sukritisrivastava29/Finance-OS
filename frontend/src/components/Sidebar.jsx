@@ -2,6 +2,13 @@ import { NavLink } from "react-router-dom";
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
 
+const links = [
+  { name: "Dashboard", path: "/dashboard" },
+  { name: "Transactions", path: "/transactions" },
+  { name: "Insights", path: "/insights" },
+  { name: "Profile", path: "/profile" },
+];
+
 function Sidebar() {
   const [open, setOpen] = useState(false);
 
@@ -16,17 +23,16 @@ function Sidebar() {
   return (
     <>
       {/* Mobile Header */}
-      <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-slate-900 border-b border-slate-800 flex items-center justify-between px-5 z-50">
-        <h1 className="text-xl font-bold text-white">
+      <div className="md:hidden fixed top-0 left-0 right-0 h-16 surface border-b flex items-center justify-between px-5 z-50">
+        <h1 className="text-xl font-bold">
           FinanceOS
         </h1>
 
         <button onClick={() => setOpen(true)}>
-          <Menu className="text-white" size={28} />
+          <Menu size={28} />
         </button>
       </div>
 
-      {/* Overlay */}
       {open && (
         <div
           onClick={closeSidebar}
@@ -41,7 +47,8 @@ function Sidebar() {
           top-0 left-0
           h-screen
           w-64
-          bg-slate-900
+          surface
+          border-r
           p-6
           flex
           flex-col
@@ -56,7 +63,6 @@ function Sidebar() {
           }
         `}
       >
-        {/* Mobile Close */}
         <div className="flex justify-between items-center mb-10">
           <h1 className="text-2xl font-bold">
             FinanceOS
@@ -71,71 +77,29 @@ function Sidebar() {
         </div>
 
         <div className="flex flex-col gap-3 flex-1">
-          <NavLink
-            to="/dashboard"
-            onClick={closeSidebar}
-            className={({ isActive }) =>
-              `p-3 rounded-lg transition ${
-                isActive
-                  ? "bg-slate-800"
-                  : "hover:bg-slate-800"
-              }`
-            }
-          >
-            Dashboard
-          </NavLink>
-
-          <NavLink
-            to="/transactions"
-            onClick={closeSidebar}
-            className={({ isActive }) =>
-              `p-3 rounded-lg transition ${
-                isActive
-                  ? "bg-slate-800"
-                  : "hover:bg-slate-800"
-              }`
-            }
-          >
-            Transactions
-          </NavLink>
-
-          <NavLink
-            to="/insights"
-            onClick={closeSidebar}
-            className={({ isActive }) =>
-              `p-3 rounded-lg transition ${
-                isActive
-                  ? "bg-slate-800"
-                  : "hover:bg-slate-800"
-              }`
-            }
-          >
-            Insights
-          </NavLink>
-
-          <NavLink
-            to="/profile"
-            onClick={closeSidebar}
-            className={({ isActive }) =>
-              `p-3 rounded-lg transition ${
-                isActive
-                  ? "bg-slate-800"
-                  : "hover:bg-slate-800"
-              }`
-            }
-          >
-            Profile
-          </NavLink>
+          {links.map((link) => (
+            <NavLink
+              key={link.path}
+              to={link.path}
+              onClick={closeSidebar}
+              className={({ isActive }) =>
+                `sidebar-link ${isActive ? "sidebar-active" : ""}`
+              }
+            >
+              {link.name}
+            </NavLink>
+          ))}
 
           <div className="mt-auto pt-8">
             <button
               onClick={handleLogout}
-              className="w-full bg-red-600 py-2 rounded-lg hover:bg-red-700"
+              className="w-full bg-red-600 py-2 rounded-lg hover:bg-red-700 transition"
             >
               Logout
             </button>
           </div>
         </div>
+
       </div>
     </>
   );

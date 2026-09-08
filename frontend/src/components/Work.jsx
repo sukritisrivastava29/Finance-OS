@@ -1,42 +1,50 @@
-function Work(){
-    return(
-  <section className="py-20">
-  <h2 className="text-4xl font-bold text-center mb-12">
-    How It Works
-  </h2>
+const steps = [
+  {
+    number: "01",
+    title: "Add Transactions",
+    description: "Record your income and expenses in seconds.",
+  },
+  {
+    number: "02",
+    title: "Analyze Spending",
+    description: "Understand spending patterns through visual insights.",
+  },
+  {
+    number: "03",
+    title: "Reach Goals",
+    description: "Stay on budget and achieve your financial goals.",
+  },
+];
 
-  <div className="grid md:grid-cols-3 gap-8">
-    {/* Step 1 */}
-    <div className="p-6 rounded-2xl bg-slate-800">
-      <h3 className="text-xl font-semibold mb-3">
-        Add Transactions
-      </h3>
-      <p>
-        Record your income and expenses in seconds.
-      </p>
-    </div>
+function Work() {
+  return (
+    <section className="py-20">
+      <h2 className="text-4xl font-bold text-center mb-12">
+        How It Works
+      </h2>
 
-    {/* Step 2 */}
-    <div className="p-6 rounded-2xl bg-slate-800">
-      <h3 className="text-xl font-semibold mb-3">
-        Analyze Spending
-      </h3>
-      <p>
-        Understand spending patterns through visual insights.
-      </p>
-    </div>
+      <div className="grid md:grid-cols-3 gap-8">
+        {steps.map((step) => (
 
-    {/* Step 3 */}
-    <div className="p-6 rounded-2xl bg-slate-800">
-      <h3 className="text-xl font-semibold mb-3">
-        Reach Goals
-      </h3>
-      <p>
-        Stay on budget and achieve your financial goals.
-      </p>
-    </div>
-  </div>
-</section> 
-); 
+          <div
+            key={step.title}
+            className="card-theme p-6 rounded-2xl"
+          >
+            <div className="text-primary text-4xl font-bold mb-4">
+              {step.number}
+            </div>
+            <h3 className="text-xl font-semibold mb-3">
+              {step.title}
+            </h3>
+
+            <p className="text-muted">
+              {step.description}
+            </p>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
 }
+
 export default Work;

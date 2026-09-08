@@ -30,7 +30,7 @@ function Features() {
         {features.map((feature) => (
           <div
             key={feature.title}
-            className="bg-slate-800 p-8 rounded-2xl hover:scale-105 transition"
+            className="card-theme p-8 rounded-2xl"
           >
             <div className="text-5xl mb-4">
               {feature.icon}
@@ -40,7 +40,7 @@ function Features() {
               {feature.title}
             </h3>
 
-            <p className="text-slate-300">
+            <p className="text-muted">
               {feature.description}
             </p>
           </div>

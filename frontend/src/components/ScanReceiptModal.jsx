@@ -1,8 +1,10 @@
 import { useState } from "react";
 import axios from "axios";
-import { API_URL } from "../config";
 import toast from "react-hot-toast";
 import { Upload, ScanLine, X } from "lucide-react";
+
+import { API_URL } from "../config";
+
 function ScanReceiptModal({
   onClose,
   refreshTransactions,
@@ -11,8 +13,8 @@ function ScanReceiptModal({
 
   const [selectedFile, setSelectedFile] = useState(null);
   const [preview, setPreview] = useState("");
-  const [ocrText, setOcrText] = useState("");
   const [loading, setLoading] = useState(false);
+  const [receiptData, setReceiptData] = useState(null);
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -21,87 +23,85 @@ function ScanReceiptModal({
 
     setSelectedFile(file);
     setPreview(URL.createObjectURL(file));
-    setOcrText("");
+    setReceiptData(null);
   };
-const scanReceipt = async () => {
-  if (!selectedFile) {
-    toast.error("Please select a receipt.");
-    return;
-  }
 
-  try {
-    setLoading(true);
+  const scanReceipt = async () => {
+    if (!selectedFile) {
+      toast.error("Please select a receipt.");
+      return;
+    }
 
-    const formData = new FormData();
+    try {
+      setLoading(true);
 
-    formData.append(
-      "receipt",
-      selectedFile
-    );
+      const formData = new FormData();
+      formData.append("receipt", selectedFile);
 
-    const { data } = await axios.post(
-      `${API_URL}/receipt/scan`,
-      formData,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type":
-            "multipart/form-data",
-        },
-      }
-    );
+      const { data } = await axios.post(
+        `${API_URL}/receipt/scan`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
 
-    setOcrText(data.text);
+      setReceiptData(data);
 
-    toast.success(
-  `${data.title} • ₹${data.amount} added successfully!`
-);
+      toast.success(
+        `${data.title} • ₹${data.amount} added successfully!`
+      );
 
-    refreshTransactions();
+      refreshTransactions();
 
-    setTimeout(() => {
-      onClose();
-    }, 800);
+      setTimeout(() => {
+        onClose();
+      }, 800);
+    } catch (error) {
+      console.error(error);
 
-  } catch (error) {
-    console.log(error);
-
-    toast.error(
-      error.response?.data?.message ||
-      "Receipt scanning failed"
-    );
-  } finally {
-    setLoading(false);
-  }
-};
+      toast.error(
+        error.response?.data?.message ||
+          "Receipt scanning failed"
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 px-4">
-      <div className="bg-slate-900 rounded-2xl w-full max-w-2xl p-8 relative">
+      <div className="card-theme rounded-2xl w-full max-w-2xl p-8 relative">
 
         <button
           onClick={onClose}
-          className="absolute top-5 right-5 text-slate-400 hover:text-white"
+          className="absolute top-5 right-5 text-muted hover:text-primary transition"
         >
           <X size={22} />
         </button>
 
-        <h2 className="text-3xl font-bold text-white mb-2">
+        <h2 className="text-3xl font-bold mb-2">
           Scan Receipt
         </h2>
 
-        <p className="text-slate-400 mb-6">
-          Upload a receipt and FinanceOS will extract its contents.
+        <p className="text-muted mb-6">
+          Upload a receipt and FinanceOS will automatically extract the transaction details.
         </p>
 
-        <label className="border-2 border-dashed border-slate-700 rounded-xl p-8 flex flex-col items-center justify-center cursor-pointer hover:border-blue-500 transition">
-          <Upload size={40} className="text-blue-400 mb-3" />
+        <label className="upload-box rounded-xl p-8 flex flex-col items-center justify-center cursor-pointer">
+          <Upload
+            size={40}
+            className="text-primary mb-3"
+          />
 
-          <p className="text-white font-medium">
+          <p className="font-medium">
             Click to choose receipt
           </p>
 
-          <p className="text-slate-500 text-sm mt-2">
+          <p className="text-muted text-sm mt-2">
             JPG, PNG or JPEG
           </p>
 
@@ -115,14 +115,14 @@ const scanReceipt = async () => {
 
         {preview && (
           <div className="mt-6">
-            <h3 className="text-lg font-semibold mb-3 text-white">
+            <h3 className="text-lg font-semibold mb-3">
               Preview
             </h3>
 
             <img
               src={preview}
               alt="Receipt Preview"
-              className="rounded-xl max-h-80 mx-auto border border-slate-700"
+              className="rounded-xl max-h-80 mx-auto border border-theme"
             />
           </div>
         )}
@@ -130,26 +130,39 @@ const scanReceipt = async () => {
         <button
           onClick={scanReceipt}
           disabled={loading}
-          className="w-full mt-6 bg-blue-600 hover:bg-blue-700 py-3 rounded-xl flex items-center justify-center gap-2 font-semibold transition"
+          className="primary-btn w-full mt-6 py-3 rounded-xl flex items-center justify-center gap-2 font-semibold"
         >
           <ScanLine size={20} />
 
-          {loading ? "Scanning Receipt..." : "Scan Receipt"}
+          {loading
+            ? "Scanning Receipt..."
+            : "Scan Receipt"}
         </button>
 
-       {ocrText && (
-  <div className="bg-slate-800 rounded-xl p-4 mb-4">
-    <h3 className="text-lg font-semibold text-white mb-3">
-      Extracted Information
-    </h3>
+        {receiptData && (
+          <div className="card-theme rounded-xl p-5 mt-6">
+            <h3 className="text-lg font-semibold mb-4">
+              Extracted Information
+            </h3>
 
-    <div className="space-y-2 text-slate-300">
-      <p><strong>Merchant:</strong> {merchant}</p>
-      <p><strong>Amount:</strong> ₹{amount}</p>
-      <p><strong>Category:</strong> {category}</p>
-    </div>
-  </div>
-)}
+            <div className="space-y-2 text-muted">
+              <p>
+                <strong>Merchant:</strong>{" "}
+                {receiptData.title}
+              </p>
+
+              <p>
+                <strong>Amount:</strong> ₹
+                {receiptData.amount}
+              </p>
+
+              <p>
+                <strong>Category:</strong>{" "}
+                {receiptData.category}
+              </p>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
