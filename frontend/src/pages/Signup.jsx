@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useRef } from "react";
 import axios from "axios";
+import { Eye, EyeOff } from "lucide-react";
 import { API_URL } from "../config";
 import toast from "react-hot-toast";
 
@@ -52,6 +53,7 @@ function Signup() {
       toast.error(
         error.response?.data?.message || "Registration failed"
       );
+
       console.error(error);
     } finally {
       setLoading(false);
@@ -76,7 +78,6 @@ function Signup() {
             handleSignup();
           }}
         >
-          {/* Name */}
           <input
             type="text"
             placeholder="Full Name"
@@ -91,7 +92,6 @@ function Signup() {
             className="input-theme"
           />
 
-          {/* Email */}
           <input
             ref={emailRef}
             type="email"
@@ -107,7 +107,6 @@ function Signup() {
             className="input-theme"
           />
 
-          {/* Password */}
           <div className="relative">
             <input
               ref={passwordRef}
@@ -127,13 +126,21 @@ function Signup() {
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+              className="absolute right-3 top-1/2 -translate-y-1/2
+                         text-[var(--text-muted)] hover:text-[var(--primary)]
+                         transition-colors"
+              aria-label={
+                showPassword ? "Hide password" : "Show password"
+              }
             >
-              {showPassword ? "🙈" : "👁️"}
+              {showPassword ? (
+                <EyeOff size={19} strokeWidth={1.8} />
+              ) : (
+                <Eye size={19} strokeWidth={1.8} />
+              )}
             </button>
           </div>
 
-          {/* Confirm Password */}
           <div className="relative">
             <input
               ref={confirmPasswordRef}
@@ -149,13 +156,23 @@ function Signup() {
               onClick={() =>
                 setShowConfirmPassword(!showConfirmPassword)
               }
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+              className="absolute right-3 top-1/2 -translate-y-1/2
+                         text-[var(--text-muted)] hover:text-[var(--primary)]
+                         transition-colors"
+              aria-label={
+                showConfirmPassword
+                  ? "Hide confirm password"
+                  : "Show confirm password"
+              }
             >
-              {showConfirmPassword ? "🙈" : "👁️"}
+              {showConfirmPassword ? (
+                <EyeOff size={19} strokeWidth={1.8} />
+              ) : (
+                <Eye size={19} strokeWidth={1.8} />
+              )}
             </button>
           </div>
 
-          {/* Signup Button */}
           <button
             type="submit"
             disabled={loading}
