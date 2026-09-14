@@ -1,16 +1,17 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useRef } from "react";
 import axios from "axios";
+import { Eye, EyeOff } from "lucide-react";
 import { API_URL } from "../config";
 import toast from "react-hot-toast";
 
 function Login() {
   const navigate = useNavigate();
-
   const passwordRef = useRef(null);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
@@ -31,49 +32,43 @@ function Login() {
       );
 
       localStorage.setItem("token", data.token);
-      localStorage.setItem(
-        "user",
-        JSON.stringify(data.user)
-      );
+      localStorage.setItem("user", JSON.stringify(data.user));
 
       toast.success("Welcome back!");
-
       navigate("/dashboard");
     } catch (error) {
-  const status = error.response?.status;
-  const message = error.response?.data?.message;
+      const status = error.response?.status;
+      const message = error.response?.data?.message;
 
-  if (status === 404) {
-    toast.error(
-      (t) => (
-        <div className="flex items-center gap-3">
-          <span>
-            User doesn't exist. Please create an account.
-          </span>
+      if (status === 404) {
+        toast.error(
+          (t) => (
+            <div className="flex items-center gap-3">
+              <span>
+                User doesn't exist. Please create an account.
+              </span>
 
-          <button
-            onClick={() => {
-              toast.dismiss(t.id);
-              navigate("/signup");
-            }}
-            className="font-semibold text-[var(--primary)] hover:underline whitespace-nowrap"
-          >
-            Create Account
-          </button>
-        </div>
-      ),
-      {
-        duration: 5000,
+              <button
+                onClick={() => {
+                  toast.dismiss(t.id);
+                  navigate("/signup");
+                }}
+                className="font-semibold text-[var(--primary)] hover:underline whitespace-nowrap"
+              >
+                Create Account
+              </button>
+            </div>
+          ),
+          {
+            duration: 5000,
+          }
+        );
+      } else {
+        toast.error(message || "Invalid email or password");
       }
-    );
-  } else {
-    toast.error(
-      message || "Invalid email or password"
-    );
-  }
 
-  console.error(error);
-} finally {
+      console.error(error);
+    } finally {
       setLoading(false);
     }
   };
@@ -110,16 +105,33 @@ function Login() {
             className="input-theme"
           />
 
-          <input
-            ref={passwordRef}
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) =>
-              setPassword(e.target.value)
-            }
-            className="input-theme"
-          />
+          <div className="relative">
+            <input
+              ref={passwordRef}
+              type={showPassword ? "text" : "password"}
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="input-theme w-full pr-12"
+            />
+
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-1/2 -translate-y-1/2
+                         text-[var(--text-muted)] hover:text-[var(--primary)]
+                         transition-colors"
+              aria-label={
+                showPassword ? "Hide password" : "Show password"
+              }
+            >
+              {showPassword ? (
+                <EyeOff size={19} strokeWidth={1.8} />
+              ) : (
+                <Eye size={19} strokeWidth={1.8} />
+              )}
+            </button>
+          </div>
 
           <button
             type="submit"
