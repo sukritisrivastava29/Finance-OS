@@ -3,7 +3,6 @@ import { useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
-
 function ChatMessage({ message }) {
   const isUser = message.sender === "user";
 
