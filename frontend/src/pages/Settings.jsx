@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   User,
   Palette,
@@ -21,13 +21,104 @@ import { useTheme } from "../context/ThemeContext";
 
 function Settings() {
   const [activeSection, setActiveSection] = useState("appearance");
-
   const { theme, toggleTheme } = useTheme();
 
-  const [notifications, setNotifications] = useState(true);
-  const [budgetAlerts, setBudgetAlerts] = useState(true);
-  const [monthlySummary, setMonthlySummary] = useState(true);
-  const [aiInsights, setAiInsights] = useState(true);
+  const getStored = (key, fallback) => {
+    const value = localStorage.getItem(key);
+
+    if (value === null) return fallback;
+
+    try {
+      return JSON.parse(value);
+    } catch {
+      return value;
+    }
+  };
+
+  const [notifications, setNotifications] = useState(
+    getStored("notifications", true)
+  );
+
+  const [budgetAlerts, setBudgetAlerts] = useState(
+    getStored("budgetAlerts", true)
+  );
+
+  const [monthlySummary, setMonthlySummary] = useState(
+    getStored("monthlySummary", true)
+  );
+
+  const [aiInsights, setAiInsights] = useState(
+    getStored("aiInsights", true)
+  );
+
+  const [currency, setCurrency] = useState(
+    getStored("currency", "INR")
+  );
+
+  const [monthlyBudget, setMonthlyBudget] = useState(
+    getStored("monthlyBudget", "")
+  );
+
+  const [savingsGoal, setSavingsGoal] = useState(
+    getStored("savingsGoal", "")
+  );
+
+  const [responseStyle, setResponseStyle] = useState(
+    getStored("responseStyle", "Balanced")
+  );
+
+  const [accentColor, setAccentColor] = useState(
+    localStorage.getItem("accentColor") || "blue"
+  );
+
+  useEffect(() => {
+    localStorage.setItem("notifications", JSON.stringify(notifications));
+  }, [notifications]);
+
+  useEffect(() => {
+    localStorage.setItem("budgetAlerts", JSON.stringify(budgetAlerts));
+  }, [budgetAlerts]);
+
+  useEffect(() => {
+    localStorage.setItem(
+      "monthlySummary",
+      JSON.stringify(monthlySummary)
+    );
+  }, [monthlySummary]);
+
+  useEffect(() => {
+    localStorage.setItem("aiInsights", JSON.stringify(aiInsights));
+  }, [aiInsights]);
+
+  useEffect(() => {
+    localStorage.setItem("currency", currency);
+  }, [currency]);
+
+  useEffect(() => {
+    localStorage.setItem(
+      "monthlyBudget",
+      JSON.stringify(monthlyBudget)
+    );
+  }, [monthlyBudget]);
+
+  useEffect(() => {
+    localStorage.setItem(
+      "savingsGoal",
+      JSON.stringify(savingsGoal)
+    );
+  }, [savingsGoal]);
+
+  useEffect(() => {
+    localStorage.setItem("responseStyle", responseStyle);
+  }, [responseStyle]);
+
+  useEffect(() => {
+    localStorage.setItem("accentColor", accentColor);
+    document.documentElement.setAttribute(
+      "data-accent",
+      accentColor
+    );
+  }, [accentColor]);
 
   const sections = [
     {
@@ -72,7 +163,7 @@ function Settings() {
       type="button"
       onClick={() => onChange(!enabled)}
       className={`relative h-6 w-11 rounded-full transition ${
-        enabled ? "bg-blue-600" : "bg-gray-600"
+        enabled ? "bg-[var(--accent)]" : "bg-gray-600"
       }`}
     >
       <span
@@ -91,13 +182,19 @@ function Settings() {
   }) => (
     <div className="flex flex-col gap-4 border-b border-white/10 py-5 last:border-b-0 sm:flex-row sm:items-center sm:justify-between">
       <div className="flex items-center gap-4">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-500/10">
-          <Icon size={19} className="text-blue-400" />
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--accent)]/10">
+          <Icon
+            size={19}
+            className="text-[var(--accent)]"
+          />
         </div>
 
         <div>
           <p className="font-medium">{title}</p>
-          <p className="mt-1 text-sm opacity-60">{description}</p>
+
+          <p className="mt-1 text-sm opacity-60">
+            {description}
+          </p>
         </div>
       </div>
 
@@ -108,8 +205,13 @@ function Settings() {
   const Card = ({ title, description, children }) => (
     <div className="surface rounded-2xl border p-6">
       <div className="mb-2">
-        <h2 className="text-xl font-semibold">{title}</h2>
-        <p className="mt-1 text-sm opacity-60">{description}</p>
+        <h2 className="text-xl font-semibold">
+          {title}
+        </h2>
+
+        <p className="mt-1 text-sm opacity-60">
+          {description}
+        </p>
       </div>
 
       {children}
@@ -118,7 +220,6 @@ function Settings() {
 
   const renderContent = () => {
     switch (activeSection) {
-
       case "appearance":
         return (
           <Card
@@ -140,7 +241,7 @@ function Settings() {
                   }}
                   className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition ${
                     theme === "light"
-                      ? "bg-blue-600 text-white"
+                      ? "bg-[var(--accent)] text-white"
                       : "opacity-60 hover:opacity-100"
                   }`}
                 >
@@ -155,7 +256,7 @@ function Settings() {
                   }}
                   className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition ${
                     theme === "dark"
-                      ? "bg-blue-600 text-white"
+                      ? "bg-[var(--accent)] text-white"
                       : "opacity-60 hover:opacity-100"
                   }`}
                 >
@@ -181,35 +282,48 @@ function Settings() {
               description="Choose the accent used across FinanceOS."
             >
               <div className="flex gap-3">
-                <button
-                  type="button"
-                  className="h-7 w-7 rounded-full border-2 border-white bg-blue-500 transition hover:scale-110"
-                />
-
-                <button
-                  type="button"
-                  className="h-7 w-7 rounded-full bg-purple-500 transition hover:scale-110"
-                />
-
-                <button
-                  type="button"
-                  className="h-7 w-7 rounded-full bg-green-500 transition hover:scale-110"
-                />
-
-                <button
-                  type="button"
-                  className="h-7 w-7 rounded-full bg-cyan-500 transition hover:scale-110"
-                />
-
-                <button
-                  type="button"
-                  className="h-7 w-7 rounded-full bg-pink-500 transition hover:scale-110"
-                />
+                {[
+                  {
+                    name: "blue",
+                    color: "bg-blue-500",
+                  },
+                  {
+                    name: "purple",
+                    color: "bg-purple-500",
+                  },
+                  {
+                    name: "green",
+                    color: "bg-green-500",
+                  },
+                  {
+                    name: "cyan",
+                    color: "bg-cyan-500",
+                  },
+                  {
+                    name: "pink",
+                    color: "bg-pink-500",
+                  },
+                ].map((accent) => (
+                  <button
+                    key={accent.name}
+                    type="button"
+                    onClick={() =>
+                      setAccentColor(accent.name)
+                    }
+                    aria-label={`Set ${accent.name} accent color`}
+                    className={`h-7 w-7 rounded-full ${
+                      accent.color
+                    } transition hover:scale-110 ${
+                      accentColor === accent.name
+                        ? "scale-110 ring-2 ring-blue-500 ring-offset-2 ring-offset-[var(--background)]"
+                        : ""
+                    }`}
+                  />
+                ))}
               </div>
             </SettingRow>
           </Card>
         );
-
 
       case "account":
         return (
@@ -224,7 +338,10 @@ function Settings() {
             >
               <button
                 type="button"
-                className="rounded-lg bg-blue-600 px-4 py-2 text-sm text-white transition hover:bg-blue-700"
+                className="rounded-lg bg-[var(--accent)] px-4 py-2 text-sm text-white transition hover:opacity-90"
+                onClick={() =>
+                  alert("Profile editing will be connected next.")
+                }
               >
                 Edit Profile
               </button>
@@ -238,6 +355,9 @@ function Settings() {
               <button
                 type="button"
                 className="rounded-lg border border-white/10 px-4 py-2 text-sm transition hover:bg-white/5"
+                onClick={() =>
+                  alert("Password change will be connected next.")
+                }
               >
                 Change Password
               </button>
@@ -251,6 +371,17 @@ function Settings() {
               <button
                 type="button"
                 className="rounded-lg border border-red-500/30 px-4 py-2 text-sm text-red-400 transition hover:bg-red-500/10"
+                onClick={() => {
+                  const confirmed = window.confirm(
+                    "Are you sure you want to permanently delete your account?"
+                  );
+
+                  if (confirmed) {
+                    alert(
+                      "Account deletion will be connected next."
+                    );
+                  }
+                }}
               >
                 Delete Account
               </button>
@@ -299,7 +430,6 @@ function Settings() {
           </Card>
         );
 
-
       case "finance":
         return (
           <Card
@@ -311,14 +441,31 @@ function Settings() {
               title="Currency"
               description="Default currency used throughout FinanceOS."
             >
-              <select className="rounded-lg border border-white/10 bg-transparent px-4 py-2 text-sm outline-none">
-                <option className="bg-slate-900">
+              <select
+                value={currency}
+                onChange={(e) =>
+                  setCurrency(e.target.value)
+                }
+                className="rounded-lg border border-white/10 bg-transparent px-4 py-2 text-sm outline-none"
+              >
+                <option
+                  value="INR"
+                  className="bg-slate-900"
+                >
                   ₹ INR — Indian Rupee
                 </option>
-                <option className="bg-slate-900">
+
+                <option
+                  value="USD"
+                  className="bg-slate-900"
+                >
                   $ USD — US Dollar
                 </option>
-                <option className="bg-slate-900">
+
+                <option
+                  value="EUR"
+                  className="bg-slate-900"
+                >
                   € EUR — Euro
                 </option>
               </select>
@@ -330,9 +477,20 @@ function Settings() {
               description="Set your monthly spending limit."
             >
               <div className="flex items-center rounded-lg border border-white/10 px-3">
-                <span className="opacity-60">₹</span>
+                <span className="opacity-60">
+                  {currency === "INR"
+                    ? "₹"
+                    : currency === "USD"
+                    ? "$"
+                    : "€"}
+                </span>
+
                 <input
                   type="number"
+                  value={monthlyBudget}
+                  onChange={(e) =>
+                    setMonthlyBudget(e.target.value)
+                  }
                   placeholder="50,000"
                   className="w-24 bg-transparent px-2 py-2 text-sm outline-none"
                 />
@@ -345,9 +503,20 @@ function Settings() {
               description="Set your monthly savings target."
             >
               <div className="flex items-center rounded-lg border border-white/10 px-3">
-                <span className="opacity-60">₹</span>
+                <span className="opacity-60">
+                  {currency === "INR"
+                    ? "₹"
+                    : currency === "USD"
+                    ? "$"
+                    : "€"}
+                </span>
+
                 <input
                   type="number"
+                  value={savingsGoal}
+                  onChange={(e) =>
+                    setSavingsGoal(e.target.value)
+                  }
                   placeholder="10,000"
                   className="w-24 bg-transparent px-2 py-2 text-sm outline-none"
                 />
@@ -355,7 +524,6 @@ function Settings() {
             </SettingRow>
           </Card>
         );
-
 
       case "ai":
         return (
@@ -379,10 +547,33 @@ function Settings() {
               title="Response Style"
               description="Choose how detailed AI responses should be."
             >
-              <select className="rounded-lg border border-white/10 bg-transparent px-4 py-2 text-sm outline-none">
-                <option className="bg-slate-900">Concise</option>
-                <option className="bg-slate-900">Balanced</option>
-                <option className="bg-slate-900">Detailed</option>
+              <select
+                value={responseStyle}
+                onChange={(e) =>
+                  setResponseStyle(e.target.value)
+                }
+                className="rounded-lg border border-white/10 bg-transparent px-4 py-2 text-sm outline-none"
+              >
+                <option
+                  value="Concise"
+                  className="bg-slate-900"
+                >
+                  Concise
+                </option>
+
+                <option
+                  value="Balanced"
+                  className="bg-slate-900"
+                >
+                  Balanced
+                </option>
+
+                <option
+                  value="Detailed"
+                  className="bg-slate-900"
+                >
+                  Detailed
+                </option>
               </select>
             </SettingRow>
 
@@ -394,13 +585,18 @@ function Settings() {
               <button
                 type="button"
                 className="rounded-lg border border-white/10 px-4 py-2 text-sm transition hover:bg-white/5"
+                onClick={() => {
+                  localStorage.removeItem("aiChatHistory");
+                  window.dispatchEvent(
+                    new Event("aiChatCleared")
+                  );
+                }}
               >
                 Clear Chat
               </button>
             </SettingRow>
           </Card>
         );
-
 
       case "privacy":
         return (
@@ -444,13 +640,23 @@ function Settings() {
               <button
                 type="button"
                 className="rounded-lg border border-red-500/30 px-4 py-2 text-sm text-red-400 transition hover:bg-red-500/10"
+                onClick={() => {
+                  const confirmed = window.confirm(
+                    "Are you sure you want to clear all transaction history?"
+                  );
+
+                  if (confirmed) {
+                    alert(
+                      "Transaction deletion will be connected next."
+                    );
+                  }
+                }}
               >
                 Clear Data
               </button>
             </SettingRow>
           </Card>
         );
-
 
       case "about":
         return (
@@ -460,15 +666,18 @@ function Settings() {
           >
             <div className="rounded-xl border border-white/10 p-5">
               <div className="flex items-center gap-4">
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-500/10">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--accent)]/10">
                   <Wallet
-                    className="text-blue-400"
+                    className="text-[var(--accent)]"
                     size={24}
                   />
                 </div>
 
                 <div>
-                  <h3 className="font-semibold">FinanceOS</h3>
+                  <h3 className="font-semibold">
+                    FinanceOS
+                  </h3>
+
                   <p className="text-sm opacity-60">
                     Personal Finance Management Platform
                   </p>
@@ -477,17 +686,26 @@ function Settings() {
 
               <div className="mt-6 space-y-3 text-sm">
                 <div className="flex justify-between">
-                  <span className="opacity-60">Version</span>
+                  <span className="opacity-60">
+                    Version
+                  </span>
+
                   <span>1.0.0</span>
                 </div>
 
                 <div className="flex justify-between">
-                  <span className="opacity-60">AI Engine</span>
+                  <span className="opacity-60">
+                    AI Engine
+                  </span>
+
                   <span>Gemini 2.5 Flash</span>
                 </div>
 
                 <div className="flex justify-between">
-                  <span className="opacity-60">Platform</span>
+                  <span className="opacity-60">
+                    Platform
+                  </span>
+
                   <span>FinanceOS Web</span>
                 </div>
               </div>
@@ -503,7 +721,6 @@ function Settings() {
   return (
     <div className="px-5 py-8 md:px-10">
       <div className="mx-auto max-w-6xl">
-
         <div className="mb-8">
           <h1 className="text-3xl font-bold">
             Settings
@@ -530,7 +747,7 @@ function Settings() {
                   }
                   className={`flex items-center gap-2 rounded-xl px-4 py-3 text-sm transition ${
                     active
-                      ? "bg-blue-600 text-white"
+                      ? "bg-[var(--accent)] text-white"
                       : "opacity-60 hover:bg-white/5 hover:opacity-100"
                   }`}
                 >
