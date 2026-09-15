@@ -19,6 +19,7 @@ function Transactions() {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
 const [showModal, setShowModal] = useState(false);
+const [showScanner, setShowScanner] = useState(false);
 const [editingTransaction, setEditingTransaction] = useState(null);
   const token = localStorage.getItem("token");
   const [summary, setSummary] = useState({
