@@ -7,6 +7,7 @@ import Insights from "./pages/Insights";
 import Profile from "./pages/Profile";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import Settings from "./pages/Settings";
 function App() {
   return (
     <BrowserRouter>
@@ -18,6 +19,7 @@ function App() {
 <Route path="/profile" element={<Profile />} />
 <Route path="/login" element={<Login />} />
 <Route path="/signup" element={<Signup />} />
+<Route path="/settings" element={<Settings />} />
       </Routes>
     </BrowserRouter>
   );

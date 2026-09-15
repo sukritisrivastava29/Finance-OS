@@ -1,3 +1,7 @@
+const User = require("../models/User");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+
 const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -8,14 +12,12 @@ const loginUser = async (req, res) => {
 
     console.log("USER:", user);
 
-    // User does not exist
     if (!user) {
       return res.status(404).json({
         message: "User doesn't exist. Please create an account.",
       });
     }
 
-    // User exists, but password is wrong
     const isMatch = await bcrypt.compare(password, user.password);
 
     console.log("MATCH:", isMatch);
@@ -41,7 +43,6 @@ const loginUser = async (req, res) => {
         avatar: user.avatar,
       },
     });
-
   } catch (error) {
     console.log(error);
 
@@ -49,4 +50,8 @@ const loginUser = async (req, res) => {
       message: error.message,
     });
   }
+};
+
+module.exports = {
+  loginUser,
 };

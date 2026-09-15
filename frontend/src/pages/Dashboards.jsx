@@ -125,7 +125,7 @@ useEffect(() => {
 }, [navigate]);
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white flex">
+    <div className="min-h-screen flex">
       <Sidebar />
 
      <div className="flex-1 p-4 md:p-10 pt-20 md:pt-10 overflow-x-hidden">
@@ -135,7 +135,7 @@ useEffect(() => {
       Dashboard
     </h1>
 
-    <p className="text-slate-400">
+<p className="opacity-60">
       👋 Welcome back, {user?.name}
     </p>
   </div>
@@ -178,9 +178,8 @@ useEffect(() => {
 
 </div>
 </div>
-        {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-slate-900 rounded-2xl p-6 shadow-lg hover:shadow-green-500/20 hover:-translate-y-1 transition-all duration-300">
+          <div className="surface rounded-2xl border p-6 shadow-lg hover:shadow-green-500/20 hover:-translate-y-1 transition-all duration-300">
           <div className="flex items-center gap-4">
             <div className="bg-green-500/20 p-4 rounded-xl">
               <TrendingUp
@@ -201,7 +200,7 @@ useEffect(() => {
           </div>
         </div>
         
-        <div className="bg-slate-900 rounded-2xl p-6 shadow-lg hover:shadow-red-500/20 hover:-translate-y-1 transition-all duration-300">
+        <div className="surface rounded-2xl border p-6 shadow-lg hover:shadow-red-500/20 hover:-translate-y-1 transition-all duration-300">
           <div className="flex items-center gap-4">
             <div className="bg-red-500/20 p-4 rounded-xl">
               <TrendingDown
@@ -222,7 +221,7 @@ useEffect(() => {
           </div>
         </div>
         
-         <div className="bg-slate-900 rounded-2xl p-6 shadow-lg hover:shadow-blue-500/20 hover:-translate-y-1 transition-all duration-300">
+         <div className="surface rounded-2xl border p-6 shadow-lg hover:shadow-blue-500/20 hover:-translate-y-1 transition-all duration-300">
           <div className="flex items-center gap-4">
             <div className="bg-blue-500/20 p-4 rounded-xl">
               <Wallet
@@ -244,26 +243,25 @@ useEffect(() => {
         </div>
         </div>
 
-        {/* Recent Transactions */}
-        <div className="bg-slate-900 rounded-xl p-4 md:p-6 mb-8 overflow-hidden">
+        <div className="surface rounded-2xl border p-4 md:p-6 mb-8 overflow-hidden">
           <h2 className="text-2xl font-bold mb-4">
             Recent Transactions
           </h2>
 
          <div className="space-y-4">
   {transactions.length === 0 ? (
-    <p className="text-center text-slate-400 py-8">
+    <p className="text-center opacity-60 py-8">
      📭No transactions yet. Click "Add Transaction" to add your first expense.
     </p>
   ) : (
     transactions.map((transaction) => (
      <div
   key={transaction._id}
-  className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 bg-slate-800 p-4 rounded-lg"
+ className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 surface border p-4 rounded-xl"
 >
   <div>
     <p>{transaction.title}</p>
-    <p className="text-sm text-slate-400">
+   <p className="text-sm opacity-60">
       {transaction.category}
     </p>
   </div>
