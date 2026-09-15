@@ -4,6 +4,9 @@ const {
   registerUser,
   loginUser,
   updateAvatar,
+  updateProfile,
+  changePassword,
+  deleteAccount,
 } = require("../controllers/authController");
 
 const router = express.Router();
@@ -21,5 +24,11 @@ router.put(
   upload.single("avatar"),
   updateAvatar
 );
+
+router.put("/profile", protect, updateProfile);
+
+router.put("/password", protect, changePassword);
+
+router.delete("/account", protect, deleteAccount);
 
 module.exports = router;
