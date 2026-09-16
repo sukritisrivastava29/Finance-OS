@@ -1,4 +1,5 @@
 const User = require("../models/User");
+const Transaction = require("../models/Transaction");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
@@ -249,10 +250,14 @@ const deleteAccount = async (req, res) => {
       });
     }
 
+    await Transaction.deleteMany({
+      user: req.user.id,
+    });
+
     await User.findByIdAndDelete(req.user.id);
 
     res.status(200).json({
-      message: "Account deleted successfully.",
+      message: "Account and all associated data deleted successfully.",
     });
   } catch (error) {
     console.log(error);
