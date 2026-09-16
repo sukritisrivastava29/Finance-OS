@@ -34,7 +34,24 @@ const Settings = () => {
   const [isClearing, setIsClearing] = useState(false);
   const [isClearingChat, setIsClearingChat] = useState(false);
   const [toast, setToast] = useState(null);
+const [showProfileModal, setShowProfileModal] = useState(false);
+const [showPasswordModal, setShowPasswordModal] = useState(false);
+const [showDeleteAccountModal, setShowDeleteAccountModal] = useState(false);
 
+const [profileData, setProfileData] = useState({
+  name: "",
+  email: "",
+});
+
+const [passwordData, setPasswordData] = useState({
+  currentPassword: "",
+  newPassword: "",
+  confirmPassword: "",
+});
+
+const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
+const [isChangingPassword, setIsChangingPassword] = useState(false);
+const [isDeletingAccount, setIsDeletingAccount] = useState(false);
   const getStored = (key, fallback) => {
     try {
       const value = localStorage.getItem(key);
@@ -85,10 +102,18 @@ const Settings = () => {
     getStored("accentColor", "blue")
   );
 
-  // -----------------------------
-  // Persist settings
-  // -----------------------------
+  useEffect(() => {
+  try {
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
 
+    setProfileData({
+      name: user.name || "",
+      email: user.email || "",
+    });
+  } catch (error) {
+    console.error("Failed to load user:", error);
+  }
+}, []);
   useEffect(() => {
     localStorage.setItem(
       "notifications",
@@ -157,10 +182,7 @@ const Settings = () => {
     );
   }, [accentColor]);
 
-  // -----------------------------
-  // Toast
-  // -----------------------------
-
+  
   const showToast = (message, type = "success") => {
     setToast({
       message,
@@ -171,11 +193,147 @@ const Settings = () => {
       setToast(null);
     }, 3000);
   };
+const updateProfile = async () => {
+  if (!profileData.name.trim() || !profileData.email.trim()) {
+    showToast("Name and email are required.", "error");
+    return;
+  }
 
-  // -----------------------------
-  // Fetch transactions
-  // -----------------------------
+  try {
+    setIsUpdatingProfile(true);
 
+    const token = localStorage.getItem("token");
+
+    const { data } = await axios.put(
+      `${API_URL}/auth/profile`,
+      {
+        name: profileData.name,
+        email: profileData.email,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    localStorage.setItem("user", JSON.stringify(data.user));
+
+    setProfileData({
+      name: data.user.name,
+      email: data.user.email,
+    });
+
+    setShowProfileModal(false);
+
+    window.dispatchEvent(new Event("userUpdated"));
+
+    showToast("Profile updated successfully.", "success");
+  } catch (error) {
+    console.error("Profile update error:", error);
+
+    showToast(
+      error.response?.data?.message || "Failed to update profile.",
+      "error"
+    );
+  } finally {
+    setIsUpdatingProfile(false);
+  }
+};
+const changePassword = async () => {
+  if (
+    !passwordData.currentPassword ||
+    !passwordData.newPassword ||
+    !passwordData.confirmPassword
+  ) {
+    showToast("Please fill all password fields.", "error");
+    return;
+  }
+
+  if (passwordData.newPassword.length < 6) {
+    showToast(
+      "New password must be at least 6 characters.",
+      "error"
+    );
+    return;
+  }
+
+  if (passwordData.newPassword !== passwordData.confirmPassword) {
+    showToast("New passwords do not match.", "error");
+    return;
+  }
+
+  try {
+    setIsChangingPassword(true);
+
+    const token = localStorage.getItem("token");
+
+    await axios.put(
+      `${API_URL}/auth/password`,
+      {
+        currentPassword: passwordData.currentPassword,
+        newPassword: passwordData.newPassword,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    setPasswordData({
+      currentPassword: "",
+      newPassword: "",
+      confirmPassword: "",
+    });
+
+    setShowPasswordModal(false);
+
+    showToast("Password changed successfully.", "success");
+  } catch (error) {
+    console.error("Password change error:", error);
+
+    showToast(
+      error.response?.data?.message || "Failed to change password.",
+      "error"
+    );
+  } finally {
+    setIsChangingPassword(false);
+  }
+};
+const deleteAccount = async () => {
+  try {
+    setIsDeletingAccount(true);
+
+    const token = localStorage.getItem("token");
+
+    await axios.delete(`${API_URL}/auth/account`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+
+    setShowDeleteAccountModal(false);
+
+    showToast("Account deleted successfully.", "success");
+
+    setTimeout(() => {
+      window.location.href = "/login";
+    }, 1000);
+  } catch (error) {
+    console.error("Delete account error:", error);
+
+    showToast(
+      error.response?.data?.message || "Failed to delete account.",
+      "error"
+    );
+  } finally {
+    setIsDeletingAccount(false);
+  }
+};
   const fetchTransactions = async () => {
     const token = localStorage.getItem("token");
 
@@ -716,17 +874,20 @@ const Settings = () => {
               title="Profile"
               description="Manage your personal profile information."
             >
-              <button
-                onClick={() =>
-                  showToast(
-                    "Profile editing will be connected next.",
-                    "error"
-                  )
-                }
-                className="px-5 py-2 rounded-lg bg-[var(--accent)] text-white"
-              >
-                Edit Profile
-              </button>
+             <button
+  onClick={() => {
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+
+    setProfileData({
+      name: user.name || "",
+      email: user.email || "",
+    });
+
+    setShowProfileModal(true);
+  }}
+>
+  Edit Profile
+</button>
             </SettingRow>
 
             <SettingRow
@@ -734,17 +895,19 @@ const Settings = () => {
               title="Password"
               description="Change your FinanceOS account password."
             >
-              <button
-                onClick={() =>
-                  showToast(
-                    "Password change will be connected next.",
-                    "error"
-                  )
-                }
-                className="px-5 py-2 rounded-lg border border-[var(--border)]"
-              >
-                Change Password
-              </button>
+            <button
+  onClick={() => {
+    setPasswordData({
+      currentPassword: "",
+      newPassword: "",
+      confirmPassword: "",
+    });
+
+    setShowPasswordModal(true);
+  }}
+>
+  Change Password
+</button>
             </SettingRow>
 
             <SettingRow
@@ -752,17 +915,11 @@ const Settings = () => {
               title="Delete Account"
               description="Permanently delete your FinanceOS account."
             >
-              <button
-                onClick={() =>
-                  showToast(
-                    "Account deletion will be connected next.",
-                    "error"
-                  )
-                }
-                className="px-5 py-2 rounded-lg border border-red-500/30 text-red-500"
-              >
-                Delete Account
-              </button>
+             <button
+  onClick={() => setShowDeleteAccountModal(true)}
+>
+  Delete Account
+</button>
             </SettingRow>
           </Card>
         )}
@@ -1227,6 +1384,203 @@ const Settings = () => {
         </div>
       )}
 
+{showProfileModal && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+    <div className="w-full max-w-md rounded-2xl bg-[var(--card)] p-6 shadow-2xl">
+      <div className="mb-6">
+        <h2 className="text-xl font-semibold text-[var(--text)]">
+          Edit Profile
+        </h2>
+
+        <p className="mt-1 text-sm text-[var(--muted)]">
+          Update your account information.
+        </p>
+      </div>
+
+      <div className="space-y-4">
+        <div>
+          <label className="mb-2 block text-sm font-medium text-[var(--text)]">
+            Name
+          </label>
+
+          <input
+            type="text"
+            value={profileData.name}
+            onChange={(e) =>
+              setProfileData({
+                ...profileData,
+                name: e.target.value,
+              })
+            }
+            className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg)] px-4 py-3 text-[var(--text)] outline-none"
+            placeholder="Your name"
+          />
+        </div>
+
+        <div>
+          <label className="mb-2 block text-sm font-medium text-[var(--text)]">
+            Email
+          </label>
+
+          <input
+            type="email"
+            value={profileData.email}
+            onChange={(e) =>
+              setProfileData({
+                ...profileData,
+                email: e.target.value,
+              })
+            }
+            className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg)] px-4 py-3 text-[var(--text)] outline-none"
+            placeholder="you@example.com"
+          />
+        </div>
+      </div>
+
+      <div className="mt-6 flex gap-3">
+        <button
+          onClick={() => setShowProfileModal(false)}
+          className="flex-1 rounded-xl border border-[var(--border)] px-4 py-3 text-sm font-medium text-[var(--text)]"
+        >
+          Cancel
+        </button>
+
+        <button
+          onClick={updateProfile}
+          disabled={isUpdatingProfile}
+          className="flex-1 rounded-xl bg-[var(--primary)] px-4 py-3 text-sm font-medium text-white disabled:opacity-50"
+        >
+          {isUpdatingProfile ? "Saving..." : "Save Changes"}
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+{showPasswordModal && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+    <div className="w-full max-w-md rounded-2xl bg-[var(--card)] p-6 shadow-2xl">
+      <div className="mb-6">
+        <h2 className="text-xl font-semibold text-[var(--text)]">
+          Change Password
+        </h2>
+
+        <p className="mt-1 text-sm text-[var(--muted)]">
+          Enter your current password and choose a new one.
+        </p>
+      </div>
+
+      <div className="space-y-4">
+        <div>
+          <label className="mb-2 block text-sm font-medium text-[var(--text)]">
+            Current Password
+          </label>
+
+          <input
+            type="password"
+            value={passwordData.currentPassword}
+            onChange={(e) =>
+              setPasswordData({
+                ...passwordData,
+                currentPassword: e.target.value,
+              })
+            }
+            className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg)] px-4 py-3 text-[var(--text)] outline-none"
+          />
+        </div>
+
+        <div>
+          <label className="mb-2 block text-sm font-medium text-[var(--text)]">
+            New Password
+          </label>
+
+          <input
+            type="password"
+            value={passwordData.newPassword}
+            onChange={(e) =>
+              setPasswordData({
+                ...passwordData,
+                newPassword: e.target.value,
+              })
+            }
+            className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg)] px-4 py-3 text-[var(--text)] outline-none"
+          />
+        </div>
+
+        <div>
+          <label className="mb-2 block text-sm font-medium text-[var(--text)]">
+            Confirm New Password
+          </label>
+
+          <input
+            type="password"
+            value={passwordData.confirmPassword}
+            onChange={(e) =>
+              setPasswordData({
+                ...passwordData,
+                confirmPassword: e.target.value,
+              })
+            }
+            className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg)] px-4 py-3 text-[var(--text)] outline-none"
+          />
+        </div>
+      </div>
+
+      <div className="mt-6 flex gap-3">
+        <button
+          onClick={() => setShowPasswordModal(false)}
+          className="flex-1 rounded-xl border border-[var(--border)] px-4 py-3 text-sm font-medium text-[var(--text)]"
+        >
+          Cancel
+        </button>
+
+        <button
+          onClick={changePassword}
+          disabled={isChangingPassword}
+          className="flex-1 rounded-xl bg-[var(--primary)] px-4 py-3 text-sm font-medium text-white disabled:opacity-50"
+        >
+          {isChangingPassword ? "Changing..." : "Change Password"}
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+{showDeleteAccountModal && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+    <div className="w-full max-w-md rounded-2xl bg-[var(--card)] p-6 shadow-2xl">
+      <div className="mb-5">
+        <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-red-500/10">
+          <Trash2 className="h-6 w-6 text-red-500" />
+        </div>
+
+        <h2 className="text-xl font-semibold text-[var(--text)]">
+          Delete Account?
+        </h2>
+
+        <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
+          This will permanently delete your FinanceOS account.
+          This action cannot be undone.
+        </p>
+      </div>
+
+      <div className="flex gap-3">
+        <button
+          onClick={() => setShowDeleteAccountModal(false)}
+          className="flex-1 rounded-xl border border-[var(--border)] px-4 py-3 text-sm font-medium text-[var(--text)]"
+        >
+          Cancel
+        </button>
+
+        <button
+          onClick={deleteAccount}
+          disabled={isDeletingAccount}
+          className="flex-1 rounded-xl bg-red-500 px-4 py-3 text-sm font-medium text-white disabled:opacity-50"
+        >
+          {isDeletingAccount ? "Deleting..." : "Delete Account"}
+        </button>
+      </div>
+    </div>
+  </div>
+)}
       {/* Clear AI Chat Modal */}
 
       {showChatModal && (
