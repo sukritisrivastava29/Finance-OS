@@ -43,27 +43,25 @@ const updateTransaction = async (req, res) => {
     });
   }
 };
+
 const getTransactions = async (req, res) => {
   try {
-     const { q } = req.query;
+    const { q } = req.query;
 
-        // Base filter: only fetch logged-in user's transactions
-        const filter = {
-            user: req.user.id,
-        };
+    const filter = {
+      user: req.user.id,
+    };
 
-        // If user searched for something, filter by title
-        if (q) {
-            filter.title = {
-                $regex: q,
-                $options: "i", // Case-insensitive search
-            };
-        }
+    if (q) {
+      filter.title = {
+        $regex: q,
+        $options: "i",
+      };
+    }
 
-        // Fetch transactions using the filter
-        const transactions = await Transaction.find(filter).sort({
-            date: -1,
-        });
+    const transactions = await Transaction.find(filter).sort({
+      date: -1,
+    });
 
     res.status(200).json(transactions);
   } catch (error) {
@@ -90,6 +88,23 @@ const deleteTransaction = async (req, res) => {
 
     res.status(200).json({
       message: "Transaction deleted successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
+
+const clearTransactions = async (req, res) => {
+  try {
+    const result = await Transaction.deleteMany({
+      user: req.user.id,
+    });
+
+    res.status(200).json({
+      message: "All transactions deleted successfully",
+      deletedCount: result.deletedCount,
     });
   } catch (error) {
     res.status(500).json({
@@ -128,12 +143,12 @@ const getSummary = async (req, res) => {
 
 const getAnalytics = async (req, res) => {
   console.log("Analytics route hit");
+
   try {
     const transactions = await Transaction.find({
       user: req.user.id,
     });
 
-    // Expense By Category
     const categoryMap = {};
 
     transactions.forEach((transaction) => {
@@ -144,22 +159,22 @@ const getAnalytics = async (req, res) => {
       }
     });
 
-    const expenseByCategory = Object.entries(
-      categoryMap
-    ).map(([category, amount]) => ({
-      category,
-      amount,
-    }));
+    const expenseByCategory = Object.entries(categoryMap).map(
+      ([category, amount]) => ({
+        category,
+        amount,
+      })
+    );
 
-    // Monthly Income vs Expense
     const monthlyMap = {};
 
     transactions.forEach((transaction) => {
-      const month = new Date(
-        transaction.date
-      ).toLocaleString("default", {
-        month: "short",
-      });
+      const month = new Date(transaction.date).toLocaleString(
+        "default",
+        {
+          month: "short",
+        }
+      );
 
       if (!monthlyMap[month]) {
         monthlyMap[month] = {
@@ -170,16 +185,13 @@ const getAnalytics = async (req, res) => {
       }
 
       if (transaction.type === "income") {
-        monthlyMap[month].income +=
-          transaction.amount;
+        monthlyMap[month].income += transaction.amount;
       } else {
-        monthlyMap[month].expense +=
-          transaction.amount;
+        monthlyMap[month].expense += transaction.amount;
       }
     });
 
-    const monthlyIncomeExpense =
-      Object.values(monthlyMap);
+    const monthlyIncomeExpense = Object.values(monthlyMap);
 
     res.status(200).json({
       expenseByCategory,
@@ -194,13 +206,11 @@ const getAnalytics = async (req, res) => {
   }
 };
 
-
-
-
 module.exports = {
   createTransaction,
   getTransactions,
   deleteTransaction,
+  clearTransactions,
   getAnalytics,
   getSummary,
   updateTransaction,
