@@ -27,7 +27,6 @@ function Work() {
     >
       <div className="max-w-6xl mx-auto">
 
-        {/* Section heading */}
         <div className="max-w-2xl mb-16">
           <p className="text-sm font-semibold tracking-[0.2em] uppercase text-[var(--accent)] mb-4">
             How it works
@@ -46,10 +45,8 @@ function Work() {
           </p>
         </div>
 
-        {/* Steps */}
         <div className="relative">
 
-          {/* Connecting line */}
           <div className="hidden md:block absolute top-8 left-[10%] right-[10%] h-px bg-[var(--border)]" />
 
           <div className="grid md:grid-cols-3 gap-12 md:gap-8">
@@ -58,14 +55,12 @@ function Work() {
                 key={step.number}
                 className="relative group"
               >
-                {/* Number */}
                 <div className="relative z-10 w-16 h-16 rounded-2xl bg-[var(--card)] border border-[var(--border)] flex items-center justify-center mb-7 transition-all duration-300 group-hover:border-[var(--accent)] group-hover:-translate-y-1">
                   <span className="text-lg font-bold text-[var(--accent)]">
                     {step.number}
                   </span>
                 </div>
 
-                {/* Content */}
                 <h3 className="text-2xl font-semibold text-[var(--text)] mb-3">
                   {step.title}
                 </h3>
@@ -78,7 +73,6 @@ function Work() {
           </div>
         </div>
 
-        {/* Bottom statement */}
         <div className="mt-20 pt-8 border-t border-[var(--border)] flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <p className="text-[var(--muted)]">
             One place to track, understand, and improve your finances.
@@ -90,7 +84,7 @@ function Work() {
           >
             Explore features →
           </a>
-        </div>
+        </div>work
 
       </div>
     </section>
