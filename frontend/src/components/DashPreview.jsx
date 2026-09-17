@@ -44,7 +44,6 @@ function DashPreview() {
     >
       <div className="max-w-6xl mx-auto">
 
-        {/* Heading */}
         <div className="text-center max-w-2xl mx-auto mb-12">
           <p className="text-sm font-semibold tracking-[0.2em] uppercase text-[var(--accent)] mb-4">
             The FinanceOS workspace
@@ -59,11 +58,8 @@ function DashPreview() {
             money comes from, where it goes, and what to do next.
           </p>
         </div>
-
-        {/* Dashboard shell */}
         <div className="relative rounded-3xl border border-[var(--border)] bg-[var(--card)] shadow-2xl overflow-hidden">
 
-          {/* Browser bar */}
           <div className="h-12 px-5 border-b border-[var(--border)] flex items-center justify-between bg-[var(--surface)]">
             <div className="flex gap-1.5">
               <span className="w-2.5 h-2.5 rounded-full bg-[var(--border)]" />
@@ -81,10 +77,8 @@ function DashPreview() {
             />
           </div>
 
-          {/* Dashboard */}
           <div className="p-5 md:p-8">
 
-            {/* Preview label */}
             <div className="flex items-center justify-between mb-6">
               <div>
                 <p className="text-xs uppercase tracking-wider text-[var(--muted)]">
@@ -101,7 +95,6 @@ function DashPreview() {
               </div>
             </div>
 
-            {/* KPI cards */}
             <div className="grid sm:grid-cols-3 gap-4 mb-6">
 
               <div className="p-5 rounded-2xl border border-[var(--border)] bg-[var(--surface)]">
@@ -171,10 +164,8 @@ function DashPreview() {
 
             </div>
 
-            {/* Chart + transactions */}
             <div className="grid lg:grid-cols-[1.4fr_1fr] gap-5">
 
-              {/* Chart */}
               <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5">
 
                 <div className="flex items-center justify-between mb-8">
@@ -219,7 +210,6 @@ function DashPreview() {
                 </div>
               </div>
 
-              {/* Transactions */}
               <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5">
 
                 <div className="flex items-center justify-between mb-5">
