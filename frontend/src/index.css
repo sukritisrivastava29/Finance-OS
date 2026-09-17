@@ -5,7 +5,6 @@
 :root {
   --bg: #f8fafc;
   --background: #ffffff;
-
   --surface: #ffffff;
   --card: #ffffff;
   --card2: #ffffff;
@@ -16,9 +15,10 @@
 
   --accent: #3b82f6;
   --accent-hover: #2563eb;
-
   --primary: var(--accent);
 }
+
+
 [data-accent="blue"] {
   --accent: #3b82f6;
   --accent-hover: #2563eb;
@@ -43,15 +43,11 @@
   --accent: #ec4899;
   --accent-hover: #db2777;
 }
-:root {
-  --primary: var(--accent);
-}
 
 
 [data-theme="dark"] {
   --bg: #0f172a;
   --background: #020617;
-
   --surface: #111827;
   --card: #0f172a;
   --card2: #1e293b;
@@ -62,18 +58,32 @@
 }
 
 
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
 body {
+  margin: 0;
   background: var(--bg);
   color: var(--text);
-  transition: background 0.3s ease, color 0.3s ease;
+
+  transition:
+    background 0.3s ease,
+    color 0.3s ease;
 }
 
 .app-theme {
   min-height: 100vh;
   background: var(--bg);
   color: var(--text);
-  transition: background 0.35s ease, color 0.35s ease;
+
+  transition:
+    background 0.35s ease,
+    color 0.35s ease;
 }
+
 
 .surface {
   background: var(--surface);
@@ -83,12 +93,20 @@ body {
   background: var(--card);
   color: var(--text);
   border: 1px solid var(--border);
-  transition: all 0.3s ease;
+
+  transition:
+    background 0.3s ease,
+    color 0.3s ease,
+    border-color 0.3s ease,
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
 .card-theme:hover {
   transform: translateY(-6px);
-  box-shadow: 0 10px 25px
+
+  box-shadow:
+    0 10px 25px
     color-mix(in srgb, var(--accent) 15%, transparent);
 }
 
@@ -97,6 +115,7 @@ body {
   color: var(--text);
   border: 1px solid var(--border);
 }
+
 
 
 .text-primary {
@@ -110,7 +129,6 @@ body {
 .text-theme {
   color: var(--text);
 }
-
 
 .border-theme {
   border-color: var(--border);
@@ -149,12 +167,20 @@ body {
 .input-theme {
   width: 100%;
   padding: 12px 16px;
+
   border-radius: 12px;
+
   background: var(--card2);
   color: var(--text);
+
   border: 1px solid var(--border);
+
   outline: none;
-  transition: all 0.3s ease;
+
+  transition:
+    background 0.3s ease,
+    color 0.3s ease,
+    border-color 0.3s ease;
 }
 
 .input-theme:focus {
@@ -165,7 +191,10 @@ body {
 .upload-box {
   border: 2px dashed var(--border);
   background: var(--surface);
-  transition: all 0.3s ease;
+
+  transition:
+    background 0.3s ease,
+    border-color 0.3s ease;
 }
 
 .upload-box:hover {
@@ -182,6 +211,7 @@ body {
   color: var(--accent);
 }
 
+
 .status-success {
   color: #22c55e;
 }
@@ -194,6 +224,7 @@ body {
   color: var(--accent);
 }
 
+
 .icon-btn {
   border-radius: 8px;
   transition: all 0.25s ease;
@@ -202,6 +233,7 @@ body {
 .icon-btn:hover {
   background: var(--surface);
 }
+
 
 @keyframes modalIn {
   from {
@@ -213,4 +245,12 @@ body {
     opacity: 1;
     transform: scale(1);
   }
+}
+[data-compact="true"] .card-theme {
+  padding: 1rem;
+}
+
+[data-compact="true"] .border-b {
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
 }
