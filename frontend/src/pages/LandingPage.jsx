@@ -7,12 +7,16 @@ import Footer from "../components/Footer";
 
 function LandingPage() {
   return (
-    <div className="app-theme">
+    <div className="app-theme min-h-screen overflow-x-hidden">
       <Navbar />
-      <Hero />
-      <Features />
-      <Work />
-      <DashPreview />
+
+      <main>
+        <Hero />
+        <DashPreview />
+        <Features />
+        <Work />
+      </main>
+
       <Footer />
     </div>
   );
