@@ -1,6 +1,6 @@
 # 💰 FinanceOS
 
-An AI-powered personal finance management platform built with the MERN stack that enables users to manage finances, track expenses, monitor budgets, and gain AI-driven financial insights through an interactive dashboard.
+An AI-powered personal finance management platform built with the MERN stack that enables users to manage their finances, track expenses, monitor budgets, and gain AI-driven financial insights through an interactive dashboard.
 
 ---
 
