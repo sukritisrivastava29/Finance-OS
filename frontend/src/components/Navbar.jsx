@@ -1,100 +1,47 @@
-const steps = [
-  {
-    number: "01",
-    title: "Add your transactions",
-    description:
-      "Record income and expenses in seconds, or use receipt scanning to capture transactions faster.",
-  },
-  {
-    number: "02",
-    title: "Understand your spending",
-    description:
-      "See where your money goes with clear charts, categories, trends, and intelligent financial insights.",
-  },
-  {
-    number: "03",
-    title: "Make smarter decisions",
-    description:
-      "Use your financial overview and AI-powered insights to stay on budget and work toward your goals.",
-  },
-];
+import { Link } from "react-router-dom";
+import ThemeToggle from "./ThemeToggle";
 
-function Work() {
+function Navbar() {
   return (
-    <section
-      id="how-it-works"
-      className="py-24 md:py-32 px-6"
+    <nav
+      className="px-6 md:px-8 py-4 border-b"
+      style={{
+        background: "var(--surface)",
+        borderColor: "var(--border)",
+      }}
     >
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-6xl mx-auto flex items-center justify-between">
 
-        {/* Section heading */}
-        <div className="max-w-2xl mb-16">
-          <p className="text-sm font-semibold tracking-[0.2em] uppercase text-[var(--accent)] mb-4">
-            How it works
-          </p>
+        <Link
+          to="/"
+          className="text-lg font-semibold tracking-tight text-[var(--text)]"
+        >
+          FinanceOS
+        </Link>
 
-          <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-[var(--text)] leading-tight">
-            From transactions to
-            <span className="text-[var(--accent)]">
-              {" "}financial clarity.
-            </span>
-          </h2>
+        <div className="flex items-center gap-3">
 
-          <p className="mt-5 text-lg text-[var(--muted)] leading-relaxed">
-            FinanceOS brings your everyday finances together in one
-            simple workflow.
-          </p>
-        </div>
-
-        {/* Steps */}
-        <div className="relative">
-
-          {/* Connecting line */}
-          <div className="hidden md:block absolute top-8 left-[10%] right-[10%] h-px bg-[var(--border)]" />
-
-          <div className="grid md:grid-cols-3 gap-12 md:gap-8">
-            {steps.map((step) => (
-              <div
-                key={step.number}
-                className="relative group"
-              >
-                {/* Number */}
-                <div className="relative z-10 w-16 h-16 rounded-2xl bg-[var(--card)] border border-[var(--border)] flex items-center justify-center mb-7 transition-all duration-300 group-hover:border-[var(--accent)] group-hover:-translate-y-1">
-                  <span className="text-lg font-bold text-[var(--accent)]">
-                    {step.number}
-                  </span>
-                </div>
-
-                {/* Content */}
-                <h3 className="text-2xl font-semibold text-[var(--text)] mb-3">
-                  {step.title}
-                </h3>
-
-                <p className="text-[var(--muted)] leading-7 max-w-sm">
-                  {step.description}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Bottom statement */}
-        <div className="mt-20 pt-8 border-t border-[var(--border)] flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <p className="text-[var(--muted)]">
-            One place to track, understand, and improve your finances.
-          </p>
-
-          <a
-            href="#features"
-            className="text-[var(--accent)] font-medium hover:opacity-80 transition"
+          <Link
+            to="/dashboard"
+            className="hidden sm:inline-flex text-sm text-[var(--muted)] hover:text-[var(--text)] transition"
           >
-            Explore features →
-          </a>
+            Dashboard
+          </Link>
+
+          <Link
+            to="/signup"
+            className="primary-btn px-4 py-2 text-sm rounded-lg"
+          >
+            Get started
+          </Link>
+
+          <ThemeToggle />
+
         </div>
 
       </div>
-    </section>
+    </nav>
   );
 }
 
-export default Work;
+export default Navbar;
