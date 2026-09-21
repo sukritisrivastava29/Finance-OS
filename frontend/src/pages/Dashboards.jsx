@@ -8,6 +8,7 @@ import { API_URL } from "../config";
 import { useNavigate } from "react-router-dom";
 import { generatePDF } from "../utils/generatePDF";
 import FloatingAIButton from "../components/FloatingAIButton";
+
 import {
   TrendingUp,
   TrendingDown,
@@ -15,40 +16,50 @@ import {
   Plus,
   Pencil,
   Trash2,
+  Camera,
+  FileDown,
+  ArrowUpRight,
+  ArrowDownRight,
+  Receipt,
 } from "lucide-react";
+
 import toast from "react-hot-toast";
 import ScanReceiptModal from "../components/ScanReceiptModal";
-import { Camera } from "lucide-react";
+
 function Dashboards() {
- 
-  const [editingTransaction, setEditingTransaction] = useState(null);
+  const [editingTransaction, setEditingTransaction] =
+    useState(null);
+
   const [transactions, setTransactions] = useState([]);
-  const token = localStorage.getItem("token");
-  const navigate=useNavigate();
-  const user = JSON.parse(
-    localStorage.getItem("user")
-  );
+
   const [summary, setSummary] = useState({
     income: 0,
     expense: 0,
     balance: 0,
   });
+
   const [analytics, setAnalytics] = useState({
-  expenseByCategory: [],
-  monthlyIncomeExpense: [],
-});
+    expenseByCategory: [],
+    monthlyIncomeExpense: [],
+  });
+
   const [showModal, setShowModal] = useState(false);
-const [showScanner, setShowScanner] = useState(false);
+  const [showScanner, setShowScanner] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  const token = localStorage.getItem("token");
+  const user = JSON.parse(localStorage.getItem("user") || "null");
+  const navigate = useNavigate();
+
+  const headers = {
+    Authorization: `Bearer ${token}`,
+  };
 
   const fetchAnalytics = async () => {
     try {
       const { data } = await axios.get(
         `${API_URL}/transactions/analytics`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+        { headers }
       );
 
       setAnalytics(data);
@@ -61,11 +72,7 @@ const [showScanner, setShowScanner] = useState(false);
     try {
       const { data } = await axios.get(
         `${API_URL}/transactions`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+        { headers }
       );
 
       setTransactions(data);
@@ -78,271 +85,461 @@ const [showScanner, setShowScanner] = useState(false);
     try {
       const { data } = await axios.get(
         `${API_URL}/transactions/summary`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+        { headers }
       );
 
       setSummary(data);
     } catch (error) {
       console.log(error);
-    }};
+    }
+  };
 
-const deleteTransaction = async (id) => {
-  try {
-    await axios.delete(
-      `${API_URL}/transactions/${id}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
+  const refreshDashboard = async () => {
+    await Promise.all([
+      fetchTransactions(),
+      fetchSummary(),
+      fetchAnalytics(),
+    ]);
+  };
+
+  const deleteTransaction = async (id) => {
+    try {
+      await axios.delete(
+        `${API_URL}/transactions/${id}`,
+        { headers }
+      );
+
+      toast.success("Transaction deleted");
+
+      await refreshDashboard();
+    } catch (error) {
+      toast.error("Failed to delete transaction");
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    if (!token) {
+      navigate("/login");
+      return;
+    }
+
+    const loadDashboard = async () => {
+      setLoading(true);
+      await refreshDashboard();
+      setLoading(false);
+    };
+
+    loadDashboard();
+  }, [navigate]);
+
+  const formatCurrency = (value) => {
+    return Number(value || 0).toLocaleString("en-IN");
+  };
+
+  const recentTransactions = [...transactions]
+    .sort(
+      (a, b) =>
+        new Date(b.date) - new Date(a.date)
+    )
+    .slice(0, 6);
+
+  if (loading) {
+    return (
+      <div className="app-theme min-h-screen flex">
+        <Sidebar />
+
+        <main className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <div className="w-10 h-10 rounded-full border-4 border-[var(--border)] border-t-[var(--accent)] animate-spin mx-auto" />
+
+            <p className="text-muted mt-4">
+              Loading your finances...
+            </p>
+          </div>
+        </main>
+      </div>
     );
-
-    toast.success("Transaction deleted");
-
-    fetchTransactions();
-    fetchSummary();
-
-  } catch (error) {
-    toast.error("Failed to delete transaction");
-    console.log(error);
   }
-};
-
-useEffect(() => {
-   const token = localStorage.getItem("token");
-
-  if (!token) {
-    navigate("/login");
-    return;
-  }
-  fetchTransactions();
-  fetchSummary();
-  fetchAnalytics();
-}, [navigate]);
 
   return (
-    <div className="min-h-screen flex">
+    <div className="app-theme min-h-screen flex">
       <Sidebar />
 
-     <div className="flex-1 p-4 md:p-10 pt-20 md:pt-10 overflow-x-hidden">
-<div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-5 mb-8">
-  <div>
-    <h1 className="text-3xl font-bold">
-      Dashboard
-    </h1>
+      <main className="flex-1 min-w-0 p-4 md:p-8 lg:p-10 pt-20 md:pt-10 overflow-x-hidden">
 
-<p className="opacity-60">
-      👋 Welcome back, {user?.name}
-    </p>
-  </div>
+        {/* Header */}
+        <header className="mb-8">
+          <div className="flex flex-col xl:flex-row xl:items-end xl:justify-between gap-6">
 
-<div className="flex flex-wrap gap-3 w-full lg:w-auto">
-
-  <button
-    onClick={() =>
-      generatePDF(
-        transactions,
-        summary,
-        user
-      )
-    }
-    className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 flex-1 sm:flex-none px-4 py-3 rounded-xl shadow-lg hover:scale-105 transition-all"
-  >
-    📄 Export PDF
-  </button>
-
-  <button
-    onClick={() =>
-      setShowScanner(true)
-    }
-    className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 flex-1 sm:flex-none px-4 py-3 rounded-xl shadow-lg hover:scale-105 transition-all"
-  >
-    <Camera size={18} />
-    Scan Receipt
-  </button>
-
-  <button
-    onClick={() => {
-      setEditingTransaction(null);
-      setShowModal(true);
-    }}
-    className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 flex-1 sm:flex-none px-4 py-3 rounded-xl shadow-lg hover:scale-105 transition-all"
-  >
-    <Plus size={18} />
-    Add Transaction
-  </button>
-
-</div>
-</div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="surface rounded-2xl border p-6 shadow-lg hover:shadow-green-500/20 hover:-translate-y-1 transition-all duration-300">
-          <div className="flex items-center gap-4">
-            <div className="bg-green-500/20 p-4 rounded-xl">
-              <TrendingUp
-                size={30}
-                className="text-green-400"
-              />
-            </div>
-        
             <div>
-              <p className="text-slate-400">
-                Total Income
+              <p className="text-sm font-medium text-primary mb-2">
+                FINANCEOS
               </p>
-        
-              <h2 className="text-3xl font-bold text-green-400 mt-2">
-                ₹{summary.income.toLocaleString("en-IN")}
-              </h2>
+
+              <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-theme">
+                Dashboard
+              </h1>
+
+              <p className="text-muted mt-2">
+                Welcome back{user?.name ? `, ${user.name}` : ""}.
+                Here's your financial overview.
+              </p>
+            </div>
+
+            {/* Actions */}
+            <div className="flex flex-wrap gap-3">
+
+              <button
+                type="button"
+                onClick={() =>
+                  generatePDF(
+                    transactions,
+                    summary,
+                    user
+                  )
+                }
+                className="secondary-btn flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-medium"
+              >
+                <FileDown size={17} />
+                Export PDF
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setShowScanner(true)}
+                className="secondary-btn flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-medium"
+              >
+                <Camera size={17} />
+                Scan receipt
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setEditingTransaction(null);
+                  setShowModal(true);
+                }}
+                className="primary-btn flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-medium"
+              >
+                <Plus size={18} />
+                Add transaction
+              </button>
+
             </div>
           </div>
-        </div>
-        
-        <div className="surface rounded-2xl border p-6 shadow-lg hover:shadow-red-500/20 hover:-translate-y-1 transition-all duration-300">
-          <div className="flex items-center gap-4">
-            <div className="bg-red-500/20 p-4 rounded-xl">
-              <TrendingDown
-                size={30}
-                className="text-red-400"
-              />
-            </div>
-        
-            <div>
-              <p className="text-slate-400">
-                Total Expenses
-              </p>
-        
-              <h2 className="text-3xl font-bold text-red-400 mt-2">
-                ₹{summary.expense.toLocaleString("en-IN")}
-              </h2>
-            </div>
-          </div>
-        </div>
-        
-         <div className="surface rounded-2xl border p-6 shadow-lg hover:shadow-blue-500/20 hover:-translate-y-1 transition-all duration-300">
-          <div className="flex items-center gap-4">
-            <div className="bg-blue-500/20 p-4 rounded-xl">
-              <Wallet
-                size={30}
-                className="text-blue-400"
-              />
-            </div>
-        
-            <div>
-              <p className="text-slate-400">
-                Net Balance
-              </p>
-        
-              <h2 className="text-3xl font-bold text-blue-400 mt-2">
-                ₹{summary.balance.toLocaleString("en-IN")}
-              </h2>
+        </header>
+
+        {/* Summary cards */}
+        <section className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
+
+          {/* Income */}
+          <div className="card-theme rounded-2xl p-6">
+            <div className="flex items-start justify-between">
+
+              <div>
+                <p className="text-sm text-muted">
+                  Total income
+                </p>
+
+                <h2 className="text-3xl font-bold mt-3 text-green-500">
+                  ₹{formatCurrency(summary.income)}
+                </h2>
+
+                <p className="text-xs text-muted mt-2">
+                  Money coming in
+                </p>
+              </div>
+
+              <div className="w-11 h-11 rounded-xl bg-green-500/10 flex items-center justify-center">
+                <TrendingUp
+                  size={21}
+                  className="text-green-500"
+                />
+              </div>
+
             </div>
           </div>
-        </div>
-        </div>
 
-        <div className="surface rounded-2xl border p-4 md:p-6 mb-8 overflow-hidden">
-          <h2 className="text-2xl font-bold mb-4">
-            Recent Transactions
-          </h2>
+          {/* Expenses */}
+          <div className="card-theme rounded-2xl p-6">
+            <div className="flex items-start justify-between">
 
-         <div className="space-y-4">
-  {transactions.length === 0 ? (
-    <p className="text-center opacity-60 py-8">
-     📭No transactions yet. Click "Add Transaction" to add your first expense.
-    </p>
-  ) : (
-    transactions.map((transaction) => (
-     <div
-  key={transaction._id}
- className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 surface border p-4 rounded-xl"
->
-  <div>
-    <p>{transaction.title}</p>
-   <p className="text-sm opacity-60">
-      {transaction.category}
-    </p>
-  </div>
+              <div>
+                <p className="text-sm text-muted">
+                  Total expenses
+                </p>
 
-  <div className="flex items-center gap-4">
-   <p
-  className={`font-semibold flex items-center gap-2 ${
-    transaction.type === "income"
-      ? "text-green-400"
-      : "text-red-400"
-  }`}
->
-  {transaction.type === "income" ? "📈" : "📉"}
+                <h2 className="text-3xl font-bold mt-3 text-red-500">
+                  ₹{formatCurrency(summary.expense)}
+                </h2>
 
-  {transaction.type === "income"
-    ? "+"
-    : "-"}
-  ₹{transaction.amount}
-</p>
+                <p className="text-xs text-muted mt-2">
+                  Money going out
+                </p>
+              </div>
 
-<button
-  onClick={() => {
-    setEditingTransaction(transaction);
-    setShowModal(true);
-  }}
-  className="text-blue-400 hover:text-blue-600"
->
-  <Pencil size={18} />
-</button>
-    <button
-      onClick={() => {
-  if (window.confirm("Delete this transaction?")) {
-    deleteTransaction(transaction._id);
-  }
-}}
-      className="text-red-500 hover:text-red-700"
-    >
-     <Trash2 size={18} />
-    </button>
-  </div>
-</div>
-    ))
-  )}
-</div>
-        </div>
-       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-10">
-  <ExpensePieChart
-    data={analytics.expenseByCategory}
-  />
+              <div className="w-11 h-11 rounded-xl bg-red-500/10 flex items-center justify-center">
+                <TrendingDown
+                  size={21}
+                  className="text-red-500"
+                />
+              </div>
 
-  <MonthlyChart
-    data={analytics.monthlyIncomeExpense}
-  />
-</div>
-      </div>
+            </div>
+          </div>
+
+          {/* Balance */}
+          <div className="card-theme rounded-2xl p-6">
+            <div className="flex items-start justify-between">
+
+              <div>
+                <p className="text-sm text-muted">
+                  Net balance
+                </p>
+
+                <h2 className="text-3xl font-bold mt-3 text-primary">
+                  ₹{formatCurrency(summary.balance)}
+                </h2>
+
+                <p className="text-xs text-muted mt-2">
+                  Current financial position
+                </p>
+              </div>
+
+              <div className="w-11 h-11 rounded-xl bg-[var(--accent)]/10 flex items-center justify-center">
+                <Wallet
+                  size={21}
+                  className="text-primary"
+                />
+              </div>
+
+            </div>
+          </div>
+
+        </section>
+
+        {/* Analytics */}
+        <section className="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-8">
+
+          <div className="card-theme rounded-2xl p-5 md:p-6 overflow-hidden">
+            <div className="mb-5">
+              <h2 className="text-xl font-semibold">
+                Spending by category
+              </h2>
+
+              <p className="text-sm text-muted mt-1">
+                Understand where your money goes.
+              </p>
+            </div>
+
+            <ExpensePieChart
+              data={analytics.expenseByCategory}
+            />
+          </div>
+
+          <div className="card-theme rounded-2xl p-5 md:p-6 overflow-hidden">
+            <div className="mb-5">
+              <h2 className="text-xl font-semibold">
+                Income & expenses
+              </h2>
+
+              <p className="text-sm text-muted mt-1">
+                Track your financial activity over time.
+              </p>
+            </div>
+
+            <MonthlyChart
+              data={analytics.monthlyIncomeExpense}
+            />
+          </div>
+
+        </section>
+
+        {/* Recent transactions */}
+        <section className="card-theme rounded-2xl p-5 md:p-6 mb-10">
+
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+
+            <div>
+              <h2 className="text-xl font-semibold">
+                Recent transactions
+              </h2>
+
+              <p className="text-sm text-muted mt-1">
+                Your latest financial activity.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => navigate("/transactions")}
+              className="text-sm font-medium text-primary hover:opacity-80 transition"
+            >
+              View all →
+            </button>
+
+          </div>
+
+          {recentTransactions.length === 0 ? (
+            <div className="py-14 text-center">
+
+              <div className="w-14 h-14 rounded-2xl bg-[var(--surface)] border border-[var(--border)] flex items-center justify-center mx-auto">
+                <Receipt
+                  size={23}
+                  className="text-muted"
+                />
+              </div>
+
+              <h3 className="font-semibold mt-4">
+                No transactions yet
+              </h3>
+
+              <p className="text-sm text-muted mt-1">
+                Add your first transaction to start
+                understanding your finances.
+              </p>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setEditingTransaction(null);
+                  setShowModal(true);
+                }}
+                className="primary-btn mt-5 px-4 py-2.5 rounded-xl text-sm font-medium"
+              >
+                Add transaction
+              </button>
+
+            </div>
+          ) : (
+            <div className="divide-y divide-[var(--border)]">
+
+              {recentTransactions.map((transaction) => (
+                <div
+                  key={transaction._id}
+                  className="py-4 first:pt-0 last:pb-0 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
+                >
+
+                  <div className="flex items-center gap-3 min-w-0">
+
+                    <div className="w-10 h-10 rounded-xl bg-[var(--surface)] border border-[var(--border)] flex items-center justify-center shrink-0">
+                      {transaction.type === "income" ? (
+                        <ArrowUpRight
+                          size={18}
+                          className="text-green-500"
+                        />
+                      ) : (
+                        <ArrowDownRight
+                          size={18}
+                          className="text-red-500"
+                        />
+                      )}
+                    </div>
+
+                    <div className="min-w-0">
+                      <p className="font-medium truncate">
+                        {transaction.title}
+                      </p>
+
+                      <p className="text-xs text-muted mt-1">
+                        {transaction.category}
+                        {" • "}
+                        {new Date(
+                          transaction.date
+                        ).toLocaleDateString("en-IN")}
+                      </p>
+                    </div>
+
+                  </div>
+
+                  <div className="flex items-center justify-between sm:justify-end gap-5">
+
+                    <p
+                      className={`font-semibold ${
+                        transaction.type === "income"
+                          ? "text-green-500"
+                          : "text-red-500"
+                      }`}
+                    >
+                      {transaction.type === "income"
+                        ? "+"
+                        : "-"}
+                      ₹
+                      {formatCurrency(
+                        transaction.amount
+                      )}
+                    </p>
+
+                    <div className="flex items-center gap-1">
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEditingTransaction(transaction);
+                          setShowModal(true);
+                        }}
+                        className="icon-btn p-2 text-muted hover:text-primary"
+                        title="Edit transaction"
+                      >
+                        <Pencil size={17} />
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (
+                            window.confirm(
+                              "Delete this transaction?"
+                            )
+                          ) {
+                            deleteTransaction(
+                              transaction._id
+                            );
+                          }
+                        }}
+                        className="icon-btn p-2 text-muted hover:text-red-500"
+                        title="Delete transaction"
+                      >
+                        <Trash2 size={17} />
+                      </button>
+
+                    </div>
+
+                  </div>
+
+                </div>
+              ))}
+
+            </div>
+          )}
+
+        </section>
+
+      </main>
+
+      {/* Add/Edit transaction */}
       {showModal && (
-      <AddTransactionModal
-  transaction={editingTransaction}
-  onClose={() => {
-  setShowModal(false);
-  setEditingTransaction(null);
-}}
-  refreshTransactions={() => {
-    fetchTransactions();
-    fetchSummary();
-    fetchAnalytics();
-  }}
-/>
+        <AddTransactionModal
+          transaction={editingTransaction}
+          onClose={() => {
+            setShowModal(false);
+            setEditingTransaction(null);
+          }}
+          refreshTransactions={refreshDashboard}
+        />
       )}
-      {showScanner && (
-  <ScanReceiptModal
-    onClose={() => setShowScanner(false)}
-    refreshTransactions={() => {
-        fetchTransactions();
-        fetchSummary();
-        fetchAnalytics();
-    }}
-/>
-)}
 
-<FloatingAIButton/>
+      {/* Receipt scanner */}
+      {showScanner && (
+        <ScanReceiptModal
+          onClose={() => setShowScanner(false)}
+          refreshTransactions={refreshDashboard}
+        />
+      )}
+
+      {/* AI */}
+      <FloatingAIButton />
     </div>
   );
 }

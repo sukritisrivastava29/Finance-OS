@@ -254,3 +254,40 @@ body {
   padding-top: 0.75rem;
   padding-bottom: 0.75rem;
 }
+html {
+  scroll-behavior: smooth;
+}
+
+section {
+  scroll-margin-top: 90px;
+}
+
+::selection {
+  background: var(--accent);
+  color: white;
+}
+
+a {
+  transition:
+    color 0.25s ease,
+    background-color 0.25s ease,
+    border-color 0.25s ease,
+    opacity 0.25s ease;
+}
+
+.app-theme {
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+}
+
+[data-theme="dark"] .shadow-2xl {
+  box-shadow:
+    0 25px 50px -12px rgba(0, 0, 0, 0.35);
+}
+
+@media (max-width: 640px) {
+  .app-theme {
+    overflow-x: hidden;
+  }
+}

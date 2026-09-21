@@ -1,90 +1,68 @@
-import {
-  ArrowRight,
-  Play,
-  Sparkles,
-  Check,
-} from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 function Hero() {
   return (
-    <section className="relative px-6 pt-24 pb-20 md:pt-32 md:pb-28">
+    <section className="px-6 pt-20 pb-16 md:pt-28 md:pb-20">
+      <div className="max-w-6xl mx-auto">
+        <div className="max-w-3xl">
+          <p className="text-sm font-medium tracking-wide text-[var(--accent)] mb-6">
+            FINANCEOS
+          </p>
 
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-[var(--accent)] opacity-[0.07] blur-[120px] rounded-full" />
-      </div>
+          <h1 className="text-5xl md:text-7xl font-semibold tracking-[-0.04em] leading-[1.02] text-[var(--text)]">
+            Your finances,
+            <br />
+            <span className="text-[var(--muted)]">
+              in one place.
+            </span>
+          </h1>
 
-      <div className="relative max-w-6xl mx-auto text-center">
+          <p className="max-w-xl mt-7 text-lg md:text-xl leading-8 text-[var(--muted)]">
+            Track your money, understand your spending, and
+            make better financial decisions without the clutter.
+          </p>
 
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[var(--border)] bg-[var(--card)] text-sm text-[var(--muted)] mb-8">
-          <Sparkles
-            size={15}
-            className="text-[var(--accent)]"
-          />
-
-          Intelligent personal finance
+          <div className="mt-8">
+            <a
+              href="/signup"
+              className="primary-btn inline-flex items-center gap-2 px-5 py-3 rounded-lg font-medium"
+            >
+              Get started
+              <ArrowRight size={17} />
+            </a>
+          </div>
         </div>
 
-        <h1 className="max-w-5xl mx-auto text-5xl md:text-7xl font-bold tracking-[-0.04em] leading-[1.05] text-[var(--text)]">
-          Your money.
-          <br />
+        <div className="mt-16 pt-6 border-t border-[var(--border)]">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-sm">
+            <div>
+              <p className="font-medium text-[var(--text)]">
+                Track
+              </p>
+              <p className="mt-1 text-[var(--muted)]">
+                Income and expenses
+              </p>
+            </div>
 
-          <span className="text-[var(--accent)]">
-            Your command center.
-          </span>
-        </h1>
+            <div>
+              <p className="font-medium text-[var(--text)]">
+                Understand
+              </p>
+              <p className="mt-1 text-[var(--muted)]">
+                Spending patterns and insights
+              </p>
+            </div>
 
-        <p className="max-w-2xl mx-auto mt-7 text-lg md:text-xl leading-8 text-[var(--muted)]">
-          FinanceOS brings your income, expenses, receipts,
-          reports, and AI-powered insights together in one
-          intelligent financial workspace.
-        </p>
-
-        <div className="mt-9 flex flex-col sm:flex-row justify-center gap-3">
-
-          <a
-            href="/signup"
-            className="primary-btn px-6 py-3.5 rounded-xl font-medium flex items-center justify-center gap-2"
-          >
-            Start managing your money
-            <ArrowRight size={18} />
-          </a>
-
-          <a
-            href="#preview"
-            className="secondary-btn px-6 py-3.5 rounded-xl font-medium flex items-center justify-center gap-2"
-          >
-            <Play size={17} />
-            See the dashboard
-          </a>
-
+            <div>
+              <p className="font-medium text-[var(--text)]">
+                Automate
+              </p>
+              <p className="mt-1 text-[var(--muted)]">
+                Receipts, reports and AI assistance
+              </p>
+            </div>
+          </div>
         </div>
-
-        <div className="mt-8 flex flex-wrap justify-center gap-x-6 gap-y-3 text-sm text-[var(--muted)]">
-          <span className="flex items-center gap-2">
-            <Check
-              size={15}
-              className="text-[var(--accent)]"
-            />
-            Transaction tracking
-          </span>
-
-          <span className="flex items-center gap-2">
-            <Check
-              size={15}
-              className="text-[var(--accent)]"
-            />
-            Receipt scanning
-          </span>
-
-          <span className="flex items-center gap-2">
-            <Check
-              size={15}
-              className="text-[var(--accent)]"
-            />
-            AI insights
-          </span>
-        </div>
-
       </div>
     </section>
   );
